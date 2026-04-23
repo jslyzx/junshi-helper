@@ -212,7 +212,7 @@
                     </div>
                     <div style="text-align: right;">
                         <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">${item.time}</div>
-                        <div class="todo-action">${item.type === '异常回流' ? '上报' : '处理'}</div>
+                        <div class="todo-action">${item.type === '异常回流' ? '上报' : (item.type === '材料待确认' ? '协助' : '处理')}</div>
                     </div>
                 </div>
             `).join('');

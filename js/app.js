@@ -11,6 +11,7 @@ const MockData = {
         pendingFollowup: 5
     },
     messages: [
+        { id: 100, type: "bind", unread: true, title: "新患者绑定通知", desc: "患者【林*国】已扫码绑定，请关注其资料提交进度，如有需要可协助上传。", time: "5 分钟前", icon: "👤", color: "bg-green" },
         { id: 101, type: "announcement", unread: true, title: "项目补丁说明 V2.4", desc: "请各位专员务必于本周五前完成 D10 随访数据的二次质控核对。", time: "10 分钟前", icon: "📢", color: "bg-blue" },
         { id: 102, type: "alert", unread: true, title: "随访即将逾期预警", desc: "患者【曹*云】的 D1 访视教育任务还有 2 小时截止，请尽快处理。", time: "1 小时前", icon: "⏰", color: "bg-rose" },
         { id: 103, type: "qc", unread: false, title: "数据质控已通过", desc: "您提交的患者【张*华】现场入组申请已通过审核，现已进入随访期。", time: "昨天 14:20", icon: "✅", color: "bg-green" },
@@ -33,6 +34,7 @@ const MockData = {
         ]
     },
     todoList: [
+        { id: 0, type: "材料待确认", patient: "林*国", priority: "med", desc: "患者已绑定，尚未上传入组资料", time: "刚刚" },
         { id: 1, type: "现场入组", patient: "张*华", priority: "high", desc: "需核对知情同意书签字", time: "10:30" },
         { id: 2, type: "周期提醒", patient: "李*明", priority: "med", desc: "D21 访视提醒（短信已发）", time: "14:00" },
         { id: 3, type: "异常回流", patient: "陈*生", priority: "high", desc: "AE 回流：皮疹数据漏填", time: "15:30" },
