@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>任务详情 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .detail-header {
+            position: relative;
+            padding: 80px 20px 80px; /* 增加上下内边距，适应沉浸式 */
+            color: white;
+            background: linear-gradient(135deg, #2BA471 0%, #17A05D 100%);
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: 0 4px 20px rgba(43, 164, 113, 0.2);
+            z-index: 10;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 11;
+            text-align: center;
+        }
+
+        .priority-badge {
+            font-size: 11px;
+            padding: 4px 12px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            color: white;
+            display: inline-block;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .header-content h2 { 
+            font-size: 28px; 
+            font-weight: 700; 
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .detail-card {
+            margin-top: -30px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid #F0F2F5;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: var(--text-muted); font-size: 14px; }
+        .info-value { color: var(--text-main); font-weight: 500; }
+
+        .operation-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 12px;
+        }
+        .btn-flex { flex: 1; }
+        .btn {
+            width: 100%;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+        .btn-secondary {
+            background: var(--primary-soft);
+            color: var(--primary-color);
+        }
+        .btn:active { transform: scale(0.96); opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="header" style="background: transparent; border: none; position: absolute; color: white; width: 100%; top: 0; left: 0; z-index: 20;">
+        <div class="back-btn" onclick="history.back()" style="background: rgba(255,255,255,0.25); color: white; margin-left: 0; backdrop-filter: blur(4px);">✕</div>
+        <h1 style="color: white; font-weight: 600; font-size: 17px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">任务处理</h1>
+    </div>
+
+    <!-- 移除了 id="headerSection" 上硬编码的 background，改由 JS 控制类名 -->
+    <div class="detail-header" id="headerSection">
+        <div class="header-content">
+            <div class="priority-badge" id="priorityTag">--</div>
+            <h2 id="taskType">加载中...</h2>
+            <p style="opacity: 0.85; font-size: 13px;" id="taskTime">--</p>
+        </div>
+    </div>
+
+    <div class="container detail-card">
+        <div class="card">
+            <div class="info-row">
+                <span class="info-label">关联患者</span>
+                <span class="info-value" id="patientName">--</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">任务描述</span>
+                <span class="info-value" style="text-align: right; max-width: 60%;" id="taskDesc">--</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">计划时间</span>
+                <span class="info-value" id="planTime">--</span>
+            </div>
+            <div class="info-row" style="border-bottom: none;">
+                <span class="info-label">状态</span>
+                <span class="info-value" style="color: var(--warning-color);">待处理</span>
+            </div>
+        </div>
+
+        <div class="section-title">操作指南</div>
+        <div class="card" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+            1. 请先核实关联患者的基本身份信息。<br>
+            2. 按照 SOP 要求，在指定时间内完成相关数据的采集与录入。<br>
+            3. 处理完成后，点击下方的“确认处理”按钮以同步至系统。
+        </div>
+    </div>
+
+    <div class="operation-bar">
+        <div class="btn-flex">
+            <div class="btn btn-secondary" onclick="alert('即将拨号...')">联系患者</div>
+        </div>
+        <div class="btn-flex">
+            <div class="btn btn-primary" onclick="completeTask()">前往处理及填报</div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        function loadTaskDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = parseInt(urlParams.get('id'));
+            const todos = App.getTodos();
+            const task = todos.find(t => t.id === id) || todos[0];
+
+            document.getElementById('priorityTag').innerText = task.priority === 'high' ? '紧急任务' : (task.priority === 'med' ? '常规任务' : '低优任务');
+            document.getElementById('taskType').innerText = task.type;
+            document.getElementById('taskTime').innerText = `更新时间：${task.time}`;
+            document.getElementById('patientName').innerText = task.patient;
+            document.getElementById('taskDesc').innerText = task.desc;
+            document.getElementById('planTime').innerText = `今日 ${task.time}`;
+            
+            if (task.priority === 'high') {
+                document.getElementById('headerSection').style.background = 'linear-gradient(135deg, #D54941 0%, #B22222 100%)';
+                document.getElementById('headerSection').style.boxShadow = '0 4px 20px rgba(213, 73, 65, 0.2)';
+            }
+        }
+
+        function completeTask() {
+            const taskType = document.getElementById('taskType').innerText;
+            if (taskType.includes('入组')) {
+                window.location.href = 'enroll-form.html';
+            } else if (taskType.includes('随访')) {
+                window.location.href = 'followup-form.html';
+            } else if (taskType.includes('召回')) {
+                window.location.href = 'recall-form.html';
+            } else if (taskType.includes('异常')) {
+                window.location.href = 'abnormal-form.html';
+            } else if (taskType.includes('教育')) {
+                window.location.href = 'edu-form.html';
+            } else {
+                alert('任务已完结！');
+                history.back();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadTaskDetail);
+    </script>
+</body>
+</html>

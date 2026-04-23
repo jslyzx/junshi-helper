@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>任务管理 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .search-bar {
+            background: white; border-radius: 12px; height: 44px; display: flex; align-items: center;
+            padding: 0 16px; margin-bottom: 16px; border: 1px solid #E5E6EB;
+        }
+        .search-bar input { border: none; outline: none; flex: 1; font-size: 14px; margin-left: 8px; }
+
+        .tabs-scroll {
+            display: flex; overflow-x: auto; gap: 20px; margin-bottom: 20px; padding-bottom: 8px;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .tabs-scroll::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            white-space: nowrap; font-size: 14px; color: var(--text-muted); position: relative; cursor: pointer;
+            padding-bottom: 4px; border-bottom: 2px solid transparent; transition: all 0.2s;
+        }
+        .tab-btn.active { color: var(--primary-color); font-weight: 700; border-bottom-color: var(--primary-color); }
+
+        .task-card {
+            background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px;
+            border: 1px solid #F0F2F5; display: flex; gap: 12px; transition: transform 0.2s;
+        }
+        .task-card:active { transform: scale(0.98); background: var(--primary-soft); }
+        .task-icon-circle {
+            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: white; flex-shrink: 0;
+        }
+        .task-main { flex: 1; }
+        .task-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .task-p-name { font-size: 15px; font-weight: 700; color: var(--text-main); }
+        .task-timer { font-size: 11px; color: var(--danger-color); font-weight: 600; }
+        .task-meta { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="back-btn" onclick="location.href='index.html'">✕</div>
+        <h1>全部任务 (14)</h1>
+    </div>
+
+    <div class="container" style="padding-top: 16px;">
+        <!-- 搜索 -->
+        <div class="search-bar">
+            <span>🔍</span>
+            <input type="text" placeholder="搜索患者姓名、身份证号">
+        </div>
+
+        <!-- 任务分类 -->
+        <div class="tabs-scroll">
+            <div class="tab-btn active" onclick="switchTaskTab(this, 'all')">全部</div>
+            <div class="tab-btn" onclick="switchTaskTab(this, 'edu')">首周期教育</div>
+            <div class="tab-btn" onclick="switchTaskTab(this, 'follow')">标准随访</div>
+            <div class="tab-btn" onclick="switchTaskTab(this, 'recall')">失访召回</div>
+            <div class="tab-btn" onclick="switchTaskTab(this, 'error')">异常回流</div>
+        </div>
+
+        <!-- 任务列表 -->
+        <div id="taskListContent">
+            <!-- 由 JS 渲染 -->
+        </div>
+    </div>
+
+    <!-- 底部 Tab 栏 -->
+    <nav class="tab-bar">
+        <a href="index.html" class="tab-item">
+            <span class="tab-icon">🏠</span>
+            <span>首页</span>
+        </a>
+        <a href="#" class="tab-item active">
+            <span class="tab-icon" style="position: relative;">📋 <span class="badge">14</span></span>
+            <span>任务管理</span>
+        </a>
+        <a href="report-center.html" class="tab-item">
+            <span class="tab-icon">📊</span>
+            <span>数据报表</span>
+        </a>
+        <a href="my.html" class="tab-item">
+            <span class="tab-icon">👤</span>
+            <span>我的</span>
+        </a>
+    </nav>
+
+    <script src="js/app.js"></script>
+    <script>
+        const tasks = [
+            { id: 5, type: 'education', patient: '曹*云', gender: '女', age: 54, deadline: '剩余 2小时', desc: 'ADC 药物输注后教育', icon: '📚', color: 'bg-blue' },
+            { id: 6, type: 'followup', patient: '刘*财', gender: '男', age: 62, deadline: '已逾期 1天', desc: 'D14 实验室检查检查单核对', icon: '📅', color: 'bg-green' },
+            { id: 4, type: 'recall', patient: '张*兰', gender: '女', age: 48, deadline: '剩余 5小时', desc: '失访召回：第二次电话联系', icon: '📞', color: 'bg-rose' },
+            { id: 3, type: 'abnormal', patient: '陈*生', gender: '男', age: 70, deadline: '紧急', desc: 'AE 回流：皮疹数据漏填', icon: '⚠️', color: 'bg-purple' },
+            { id: 2, type: 'remind', patient: '赵*刚', gender: '男', age: 59, deadline: '明天', desc: '周期提醒：D21 住院预约确认', icon: '⏰', color: 'bg-teal' }
+        ];
+
+        function renderTasks(filter = 'all') {
+            const list = document.getElementById('taskListContent');
+            const filteredTasks = filter === 'all' ? tasks : tasks.filter(t => {
+                if (filter === 'edu') return t.type === 'education';
+                if (filter === 'follow') return t.type === 'followup';
+                if (filter === 'recall') return t.type === 'recall';
+                if (filter === 'error') return t.type === 'abnormal';
+                return true;
+            });
+
+            list.innerHTML = filteredTasks.map(t => `
+                <div class="task-card animate-up" onclick="App.navigateTo('task-detail.html?id=' + ${t.id})">
+                    <div class="task-icon-circle ${t.color}">${t.icon}</div>
+                    <div class="task-main">
+                        <div class="task-header">
+                            <span class="task-p-name">${t.patient} <small style="font-weight:400; color:var(--text-muted)">${t.gender} | ${t.age}岁</small></span>
+                            <span class="task-timer" style="${t.deadline.includes('逾期') ? '' : 'color:var(--primary-color)'}">${t.deadline}</span>
+                        </div>
+                        <div class="task-meta">${t.desc}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="status-tag status-active" style="font-size:10px">待处理</span>
+                            <span style="font-size:11px; color:var(--text-muted)">更新于 10分钟前</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchTaskTab(el, type) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            renderTasks(type);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const typeParam = params.get('type');
+            if (typeParam) {
+                // 简单匹配
+                const tabMap = { 'education': 'edu', 'followup': 'follow', 'recall': 'recall', 'abnormal': 'error' };
+                const tabType = tabMap[typeParam] || 'all';
+                const targetTab = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabType));
+                if (targetTab) switchTaskTab(targetTab, tabType);
+            } else {
+                renderTasks();
+            }
+        });
+    </script>
+</body>
+</html>

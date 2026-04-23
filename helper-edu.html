@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>学习中心 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .filter-bar {
+            display: flex; gap: 8px; overflow-x: auto; padding: 0 0 16px;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-chip {
+            flex-shrink: 0; padding: 8px 16px; border-radius: 20px;
+            background: white; border: 1px solid #E5E6EB; color: var(--text-secondary);
+            font-size: 13px; font-weight: 500; cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .filter-chip.active {
+            background: var(--primary-color); color: white; border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(43, 164, 113, 0.2);
+        }
+        .filter-chip:active { transform: scale(0.95); }
+
+        .edu-card {
+            display: flex; gap: 16px; align-items: flex-start; cursor: pointer;
+        }
+        .edu-card:active { transform: scale(0.99); }
+        .edu-thumb {
+            width: 80px; height: 80px; border-radius: 14px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+        }
+        .edu-body { flex: 1; min-width: 0; }
+        .edu-title {
+            font-size: 15px; font-weight: 700; color: var(--text-main);
+            line-height: 1.4; margin-bottom: 6px;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .edu-summary {
+            font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .edu-footer { display: flex; align-items: center; gap: 8px; }
+        .cat-tag {
+            font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
+        }
+        .cat-疾病基础 { background: #EBF5FF; color: #0052D9; }
+        .cat-产品知识 { background: #EAF7F1; color: #2BA471; }
+        .cat-合规要求 { background: #FFF2E6; color: #E37318; }
+        .cat-AE\/PV流程 { background: #FDEEEE; color: #D54941; }
+        .cat-沟通技巧 { background: #F3F2FD; color: #7367F0; }
+        .cat-系统操作 { background: #E8F8F5; color: #0097A7; }
+
+        .edu-read { font-size: 11px; color: var(--text-muted); }
+        .empty-state { padding: 60px 20px; text-align: center; color: var(--text-muted); }
+
+        .category-icons { font-size: 28px; }
+    </style>
+</head>
+<body>
+    <div class="header" style="position: sticky; top: 0; z-index: 10;">
+        <div class="back-btn" onclick="history.back()">‹</div>
+        <h1>学习中心</h1>
+    </div>
+
+    <div class="container">
+        <!-- 分类筛选 -->
+        <div class="filter-bar animate-up">
+            <div class="filter-chip active" onclick="filterBy('全部')">全部</div>
+            <div class="filter-chip" onclick="filterBy('疾病基础')">🧬 疾病基础</div>
+            <div class="filter-chip" onclick="filterBy('产品知识')">💊 产品知识</div>
+            <div class="filter-chip" onclick="filterBy('合规要求')">📜 合规要求</div>
+            <div class="filter-chip" onclick="filterBy('AE/PV流程')">🚨 AE/PV</div>
+            <div class="filter-chip" onclick="filterBy('沟通技巧')">💬 沟通技巧</div>
+            <div class="filter-chip" onclick="filterBy('系统操作')">🖥️ 系统操作</div>
+        </div>
+
+        <!-- 文章列表 -->
+        <div id="eduList"></div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const categoryIcons = {
+            '疾病基础': '🧬', '产品知识': '💊', '合规要求': '📜',
+            'AE/PV流程': '🚨', '沟通技巧': '💬', '系统操作': '🖥️'
+        };
+        const categoryBg = {
+            '疾病基础': 'linear-gradient(135deg, #EBF5FF 0%, #D6E8FF 100%)',
+            '产品知识': 'linear-gradient(135deg, #EAF7F1 0%, #D4F0E4 100%)',
+            '合规要求': 'linear-gradient(135deg, #FFF7ED 0%, #FFECD2 100%)',
+            'AE/PV流程': 'linear-gradient(135deg, #FFF0F0 0%, #FFE0E0 100%)',
+            '沟通技巧': 'linear-gradient(135deg, #F3F2FD 0%, #E8E6FC 100%)',
+            '系统操作': 'linear-gradient(135deg, #E8F8F5 0%, #D1F2EC 100%)'
+        };
+
+        let currentFilter = '全部';
+
+        function filterBy(cat) {
+            currentFilter = cat;
+            document.querySelectorAll('.filter-chip').forEach(c => {
+                c.classList.toggle('active', c.innerText.includes(cat === '全部' ? '全部' : cat));
+            });
+            renderList();
+        }
+
+        function renderList() {
+            const container = document.getElementById('eduList');
+            let articles = MockData.helperEducation;
+            if (currentFilter !== '全部') {
+                articles = articles.filter(a => a.category === currentFilter);
+            }
+
+            if (articles.length === 0) {
+                container.innerHTML = `<div class="empty-state"><p>该分类暂无内容</p></div>`;
+                return;
+            }
+
+            container.innerHTML = articles.map((item, idx) => `
+                <div class="card edu-card animate-up" style="animation-delay: ${idx * 0.05}s;" onclick="App.navigateTo('helper-edu-detail.html?id=${item.id}')">
+                    <div class="edu-thumb" style="background: ${categoryBg[item.category] || '#f5f5f5'};">
+                        <span class="category-icons">${categoryIcons[item.category] || '📄'}</span>
+                    </div>
+                    <div class="edu-body">
+                        <div class="edu-title">${item.title}</div>
+                        <div class="edu-summary">${item.summary}</div>
+                        <div class="edu-footer">
+                            <span class="cat-tag cat-${item.category}">${item.category}</span>
+                            <span class="edu-read">${item.readCount} 阅读</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', renderList);
+    </script>
+</body>
+</html>

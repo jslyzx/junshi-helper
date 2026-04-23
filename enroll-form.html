@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>现场入组 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .step-indicator {
+            display: flex; justify-content: space-between; margin-bottom: 30px; position: relative;
+        }
+        .step-indicator::before {
+            content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 2px;
+            background: #E5E6EB; z-index: 1;
+        }
+        .step-dot {
+            width: 32px; height: 32px; border-radius: 50%; background: white; border: 2px solid #E5E6EB;
+            display: flex; align-items: center; justify-content: center; z-index: 2; font-size: 12px; font-weight: 700; color: var(--text-muted);
+        }
+        .step-dot.active { background: var(--primary-color); border-color: var(--primary-color); color: white; }
+        .step-dot.completed { background: var(--primary-light); border-color: var(--primary-color); color: var(--primary-color); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
+        .form-input {
+            width: 100%; height: 48px; border-radius: 12px; border: 1px solid #E5E6EB; padding: 0 16px;
+            font-size: 15px; font-family: inherit; transition: border-color 0.2s;
+        }
+        .form-input:focus { outline: none; border-color: var(--primary-color); background: var(--primary-soft); }
+
+        .upload-card {
+            border: 2px dashed #E5E6EB; border-radius: 16px; padding: 30px; text-align: center; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .upload-card:active { background: var(--primary-soft); border-color: var(--primary-color); }
+
+        .signature-pad {
+            width: 100%; height: 200px; background: #F7F8FA; border-radius: 16px; border: 1px solid #E5E6EB;
+            display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 13px;
+            position: relative; overflow: hidden;
+        }
+
+        .btn-group {
+            position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; padding-bottom: calc(20px + var(--safe-area-bottom));
+            background: white; border-top: 1px solid #F0F2F5; display: flex; gap: 12px;
+        }
+        .btn-flex { flex: 1; height: 50px; border-radius: 14px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .btn-outline { background: #F2F3F5; color: var(--text-secondary); }
+        .btn-primary { background: var(--primary-gradient); color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="back-btn" onclick="history.back()">✕</div>
+        <h1>患者现场入组</h1>
+    </div>
+
+    <div class="container">
+        <!-- 步骤进度 -->
+        <div class="step-indicator">
+            <div class="step-dot active">1</div>
+            <div class="step-dot">2</div>
+            <div class="step-dot">3</div>
+        </div>
+
+        <!-- 步骤 1: 基础资料 -->
+        <div id="step1">
+            <div class="section-title">基础身份信息</div>
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">患者姓名</label>
+                    <input type="text" class="form-input" placeholder="输入真实姓名">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">性别</label>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn-flex btn-outline" style="background: var(--primary-soft); border-color: var(--primary-color); color: var(--primary-color);">男</button>
+                        <button class="btn-flex btn-outline">女</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">身份证号</label>
+                    <input type="text" class="form-input" placeholder="用于系统自动校验">
+                </div>
+            </div>
+
+            <div class="section-title">项目分组</div>
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">所属组别</label>
+                    <select class="form-input">
+                        <option>试验组 (ADC 高剂量)</option>
+                        <option>对照组 (标准疗法)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤 2: 附件上传 (隐藏) -->
+        <div id="step2" class="hidden">
+            <div class="section-title">知情同意书拍照</div>
+            <div class="card">
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">请拍摄已签字的《患者知情同意书》首页，确保字迹清晰且包含日期。</p>
+                <div class="upload-card" onclick="simulateUpload(this)">
+                    <div style="font-size: 32px; margin-bottom: 8px;">📷</div>
+                    <div style="font-size: 14px; font-weight: 600;">点击拍照/上传</div>
+                </div>
+                <div id="uploadPreview" class="hidden" style="margin-top: 16px; position: relative;">
+                    <img src="https://images.unsplash.com/photo-1586762493833-2895f3484f47?q=80&w=400" style="width: 100%; border-radius: 12px;">
+                    <div style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.5); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✕</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤 3: 电子签名 (隐藏) -->
+        <div id="step3" class="hidden">
+            <div class="section-title">专员确认签名</div>
+            <div class="card">
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">我已对上述患者进行身份核实，并确认其符合入组标准。</p>
+                <div class="signature-pad" onclick="simulateSignature(this)">
+                    点击此处手写签名
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="btn-group">
+        <button class="btn-flex btn-outline" id="prevBtn" onclick="prevStep()" style="display: none;">上一步</button>
+        <button class="btn-flex btn-primary" id="nextBtn" onclick="nextStep()">下一步</button>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function nextStep() {
+            if (currentStep < 3) {
+                document.getElementById(`step${currentStep}`).classList.add('hidden');
+                const dots = document.querySelectorAll('.step-dot');
+                dots[currentStep-1].classList.remove('active');
+                dots[currentStep-1].classList.add('completed');
+                
+                currentStep++;
+                document.getElementById(`step${currentStep}`).classList.remove('hidden');
+                dots[currentStep-1].classList.add('active');
+                
+                updateBtns();
+            } else {
+                alert('入组申请已提交！正在等待数据质控审核。');
+                window.location.href = 'index.html';
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step${currentStep}`).classList.add('hidden');
+                const dots = document.querySelectorAll('.step-dot');
+                dots[currentStep-1].classList.remove('active');
+
+                currentStep--;
+                document.getElementById(`step${currentStep}`).classList.remove('hidden');
+                dots[currentStep-1].classList.remove('completed');
+                dots[currentStep-1].classList.add('active');
+
+                updateBtns();
+            }
+        }
+
+        function updateBtns() {
+            document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
+            document.getElementById('nextBtn').innerText = currentStep === 3 ? '确认提交' : '下一步';
+        }
+
+        function simulateUpload(el) {
+            el.classList.add('hidden');
+            document.getElementById('uploadPreview').classList.remove('hidden');
+        }
+
+        function simulateSignature(el) {
+            el.innerHTML = '<span style="font-family: cursive; font-size: 40px; color: #333; transform: rotate(-5deg); display: block;">陈美琳</span>';
+            el.style.background = 'white';
+        }
+    </script>
+</body>
+</html>

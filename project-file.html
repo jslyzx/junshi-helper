@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>项目档案 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .segmented-control {
+            display: flex; background: #F2F3F5; border-radius: 12px; padding: 4px; margin-bottom: 24px;
+        }
+        .segment-btn {
+            flex: 1; height: 36px; border: none; border-radius: 10px; font-size: 14px;
+            color: var(--text-secondary); background: transparent; cursor: pointer; transition: all 0.2s;
+        }
+        .segment-btn.active {
+            background: white; color: var(--primary-color); font-weight: 700; box-shadow: var(--shadow-sm);
+        }
+
+        .label-group { margin-bottom: 24px; }
+        .label-title { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+        .label-value { font-size: 16px; font-weight: 600; color: var(--text-main); line-height: 1.5; }
+
+        .sop-list { list-style: none; }
+        .sop-item {
+            display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #F0F2F5;
+        }
+        .sop-dot {
+            width: 18px; height: 18px; background: var(--primary-light); color: var(--primary-color);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 10px; margin-top: 2px; flex-shrink: 0;
+        }
+
+        .timeline { position: relative; padding-left: 24px; margin: 20px 0; }
+        .timeline::before {
+            content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #E5E6EB;
+        }
+        .timeline-item { position: relative; margin-bottom: 24px; }
+        .timeline-dot {
+            position: absolute; left: -20px; top: 4px; width: 10px; height: 10px;
+            background: var(--primary-color); border: 2px solid white; border-radius: 50%; box-shadow: 0 0 0 2px var(--primary-light);
+        }
+        .timeline-title { font-size: 14px; font-weight: 700; color: var(--text-main); }
+        .timeline-desc { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+        .contact-card {
+            background: white; border-radius: 16px; padding: 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border: 1px solid #F0F2F5;
+        }
+        .call-btn {
+            width: 40px; height: 40px; background: var(--primary-soft); color: var(--primary-color);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="back-btn" onclick="location.href='my.html'">✕</div>
+        <h1>项目档案中心</h1>
+        <div style="width: 32px;"></div>
+    </div>
+
+    <div class="container">
+        <!-- 分段选择器 -->
+        <div class="segmented-control animate-up">
+            <button class="segment-btn active" onclick="switchSegment(this, 'info')">概览</button>
+            <button class="segment-btn" onclick="switchSegment(this, 'sop')">标准/SOP</button>
+            <button class="segment-btn" onclick="switchSegment(this, 'contacts')">联系协作</button>
+        </div>
+
+        <!-- 1. 项目概览 -->
+        <div id="segment-info" class="animate-up">
+            <div class="card">
+                <div class="label-group">
+                    <div class="label-title">项目全称</div>
+                    <div class="label-value" id="projFullName">-</div>
+                </div>
+                <div class="label-group">
+                    <div class="label-title">方案编号</div>
+                    <div class="label-value" id="projCode" style="font-family: monospace;">-</div>
+                </div>
+                <div style="display: flex; gap: 40px;">
+                    <div class="label-group">
+                        <div class="label-title">临床分期</div>
+                        <div class="label-value" id="projStage">-</div>
+                    </div>
+                    <div class="label-group">
+                        <div class="label-title">申办方</div>
+                        <div class="label-value" id="projSponsor">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">研究药物</div>
+            <div class="card" style="background: var(--primary-soft); border: none;">
+                <p style="font-size: 14px; color: var(--primary-color); font-weight: 600;">特瑞普利单抗 (Toripalimab) + ADC 联合治疗</p>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px; line-height: 1.6;">
+                    本研究旨在评估在晚期实体瘤患者中的安全性、耐受性、药代动力学特征及初步抗肿瘤活性。
+                </p>
+            </div>
+        </div>
+
+        <!-- 2. SOP 标准 -->
+        <div id="segment-sop" class="hidden">
+            <div class="section-title">入组核心标准</div>
+            <div class="card">
+                <div class="sop-list" id="sopCriteriaList">
+                    <!-- JS 渲染 -->
+                </div>
+            </div>
+
+            <div class="section-title">访视周期表 (Visit Timeline)</div>
+            <div class="card">
+                <div class="timeline" id="visitTimeline">
+                    <!-- JS 渲染 -->
+                </div>
+                <p style="font-size: 11px; color: var(--danger-color); text-align: center; margin-top: 10px;">
+                    * 实际执行请严格遵守访视窗范围 (±2天)
+                </p>
+            </div>
+        </div>
+
+        <!-- 3. 联系协作 -->
+        <div id="segment-contacts" class="hidden">
+            <div class="section-title">项目核心团队</div>
+            <div id="contactList">
+                <!-- JS 渲染 -->
+            </div>
+            <div style="text-align: center; margin-top: 40px;">
+                <img src="https://api.dicebear.com/7.x/identicon/svg?seed=support" style="width: 80px; opacity:0.1">
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">如遇系统技术问题<br>请联系医疗技术部：400-888-999</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 Tab 栏 -->
+    <nav class="tab-bar">
+        <a href="index.html" class="tab-item">
+            <span class="tab-icon">🏠</span>
+            <span>首页</span>
+        </a>
+        <a href="task-list.html" class="tab-item">
+            <span class="tab-icon" style="position: relative;">📋 <span class="badge">14</span></span>
+            <span>任务管理</span>
+        </a>
+        <a href="report-center.html" class="tab-item">
+            <span class="tab-icon">📊</span>
+            <span>数据报表</span>
+        </a>
+        <a href="my.html" class="tab-item active">
+            <span class="tab-icon">👤</span>
+            <span>我的</span>
+        </a>
+    </nav>
+
+    <script src="js/app.js"></script>
+    <script>
+        function renderProjectFile() {
+            const data = App.getProjectData();
+            
+            // 概览
+            document.getElementById('projFullName').innerText = data.info.fullName;
+            document.getElementById('projCode').innerText = data.info.code;
+            document.getElementById('projStage').innerText = data.info.stage;
+            document.getElementById('projSponsor').innerText = data.info.sponsor;
+
+            // SOP
+            const criteria = data.sop.find(s => s.category === '入组标准');
+            document.getElementById('sopCriteriaList').innerHTML = criteria.items.map(item => `
+                <div class="sop-item">
+                    <div class="sop-dot">✓</div>
+                    <div style="font-size: 14px; color: var(--text-main);">${item}</div>
+                </div>
+            `).join('');
+
+            const timeline = data.sop.find(s => s.category === '访视周期');
+            document.getElementById('visitTimeline').innerHTML = timeline.timeline.map((item, idx) => {
+                const parts = item.split(': ');
+                return `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-title">${parts[0]}</div>
+                        <div class="timeline-desc">${parts[1]}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // 联系人
+            document.getElementById('contactList').innerHTML = data.contacts.map(c => `
+                <div class="contact-card">
+                    <div>
+                        <div style="font-size:15px; font-weight:700;">${c.name}</div>
+                        <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">${c.role}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:16px;">
+                        <div style="font-size:13px; color:var(--text-muted);">${c.phone}</div>
+                        <a href="tel:${c.phone}" class="call-btn">📞</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchSegment(el, segment) {
+            document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            
+            document.querySelectorAll('#segment-info, #segment-sop, #segment-contacts').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`segment-${segment}`).classList.remove('hidden');
+            
+            // 触发动画
+            const target = document.getElementById(`segment-${segment}`);
+            target.style.animation = 'none';
+            target.offsetHeight; /* trigger reflow */
+            target.style.animation = 'slideUp 0.5s ease-out forwards';
+        }
+
+        document.addEventListener('DOMContentLoaded', renderProjectFile);
+    </script>
+</body>
+</html>

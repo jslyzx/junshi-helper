@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>学习详情 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .article-hero {
+            height: 100px;
+            background: linear-gradient(160deg, var(--primary-light) 0%, #FFFFFF 100%);
+            border-radius: 0 0 40px 40px;
+            margin-bottom: -70px;
+            position: relative; overflow: hidden;
+        }
+        .article-hero::before {
+            content: ''; position: absolute; top: -20%; right: -10%;
+            width: 150px; height: 150px;
+            background: rgba(43, 164, 113, 0.08);
+            border-radius: 50%; filter: blur(40px);
+        }
+        .content-card {
+            position: relative; z-index: 2;
+            padding: 32px 24px; border-radius: 28px !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05) !important;
+        }
+        .article-meta {
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 13px; color: var(--text-muted); margin-bottom: 24px;
+        }
+        .article-meta-left { display: flex; gap: 12px; align-items: center; }
+        .article-title {
+            font-size: 24px; font-weight: 800; line-height: 1.35;
+            margin-bottom: 16px; color: var(--text-main); letter-spacing: -0.5px;
+        }
+        .article-body { line-height: 1.85; color: #3A3A3C; }
+        .article-body h3 {
+            font-size: 18px; font-weight: 700; margin: 36px 0 14px;
+            color: var(--text-main); display: flex; align-items: center; gap: 10px;
+        }
+        .article-body h3::before {
+            content: ''; width: 4px; height: 18px;
+            background: var(--primary-gradient); border-radius: 2px;
+        }
+        .article-body p { margin-bottom: 20px; font-size: 15px; letter-spacing: 0.2px; }
+        .quote-box {
+            background: rgba(43, 164, 113, 0.05);
+            border-left: 5px solid var(--primary-color);
+            padding: 18px 22px; border-radius: 4px 20px 20px 4px;
+            font-size: 14px; font-style: italic; margin: 28px 0;
+            color: var(--text-secondary); line-height: 1.6;
+        }
+        .cat-badge {
+            display: inline-block; font-size: 11px; padding: 3px 10px;
+            border-radius: 6px; font-weight: 600; margin-bottom: 16px;
+        }
+        .cat-疾病基础 { background: #EBF5FF; color: #0052D9; }
+        .cat-产品知识 { background: #EAF7F1; color: #2BA471; }
+        .cat-合规要求 { background: #FFF2E6; color: #E37318; }
+        .cat-AE\/PV流程 { background: #FDEEEE; color: #D54941; }
+        .cat-沟通技巧 { background: #F3F2FD; color: #7367F0; }
+        .cat-系统操作 { background: #E8F8F5; color: #0097A7; }
+
+        .fav-btn {
+            width: 38px; height: 38px; border-radius: 12px;
+            background: #F2F3F5; color: var(--text-muted);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .fav-btn.active { color: #FF9500; background: #FFF4E5; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <div class="header" style="position: sticky; top: 0; z-index: 10;">
+        <div class="back-btn" onclick="history.back()">‹</div>
+        <h1>学习详情</h1>
+    </div>
+
+    <div class="article-hero animate-up"></div>
+
+    <div class="container" style="padding-top: 0;">
+        <div class="card content-card animate-up" style="animation-delay: 0.2s;">
+            <div id="catBadge" class="cat-badge">分类</div>
+            <h2 id="title" class="article-title">文章标题</h2>
+
+            <div class="article-meta">
+                <div class="article-meta-left">
+                    <span>🕒 <span id="date">--</span></span>
+                    <span>🔥 <span id="readCount">0</span> 阅读</span>
+                </div>
+                <div class="fav-btn" id="favBtn" onclick="toggleFav()">☆</div>
+            </div>
+
+            <div class="article-body" id="articleBody">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const articleId = parseInt(urlParams.get('id')) || 101;
+        const article = App.getHelperArticle(articleId);
+
+        // 各分类的模拟正文内容
+        const bodyTemplates = {
+            '疾病基础': `
+                <p>本文将系统梳理相关适应症的流行病学背景、病理分型与临床分期标准，帮助专员在日常工作中准确理解患者病情。</p>
+                <div class="quote-box">"对于项目专员而言，了解疾病基础知识不是为了做诊断，而是为了在与患者和医生沟通时具备必要的专业语境。"</div>
+                <h3>核心知识点</h3>
+                <p>掌握该适应症的 TNM 分期系统、常见驱动突变类型（如 EGFR、ALK、ROS1），以及不同分期患者的标准治疗路径与预后。这些知识将帮助您理解医生的治疗决策并更好地配合临床操作。</p>
+                <h3>专员关注要点</h3>
+                <p>在患者入组前的筛选评估中，需要关注入排标准中涉及的疾病分期、既往治疗线数等关键信息，确保与方案要求一致。</p>`,
+            '产品知识': `
+                <p>本文详解 ADC 类药物的作用机制、已批准适应症范围，以及标准给药周期中的关键操作节点。</p>
+                <div class="quote-box">"抗体药物偶联物（ADC）通过「精准识别+定向释放」的双重机制，实现对肿瘤细胞的靶向杀伤，被形象地称为'生物导弹'。"</div>
+                <h3>给药方案要点</h3>
+                <p>标准方案为每 21 天为一个治疗周期。D1 给药日需确认患者血常规达标，输注期间需监测输注反应。剂量调整需严格依据方案中的减量规则执行。</p>
+                <h3>常见不良反应</h3>
+                <p>需重点关注的不良反应包括：骨髓抑制（中性粒细胞减少）、皮肤毒性（皮疹、瘙痒）、胃肠道反应（恶心、腹泻）以及周围神经病变。各级别的处理措施请参照 SOP 文档执行。</p>`,
+            '合规要求': `
+                <p>在临床项目执行中，合规不是"附加项"，而是贯穿始终的底线要求。本文梳理了专员日常工作中最常涉及的合规红线。</p>
+                <div class="quote-box">"合规的核心原则：永远不要用患者隐私去换取工作便利。"</div>
+                <h3>隐私保护实操</h3>
+                <p>患者的姓名、联系方式等个人信息在微信群、邮件等非加密渠道中一律使用脱敏格式（如"张*华"）。拍照存档时确保背景中无其他患者信息。</p>
+                <h3>知情同意：沟通边界</h3>
+                <p>专员可以解释研究流程和安排，但不得对疗效做出任何承诺或暗示性表述。所有医学问题应引导患者与研究医生沟通。</p>`,
+            'AE/PV流程': `
+                <p>不良事件（AE）的及时发现、准确记录和规范上报是临床项目安全性保障的核心环节。</p>
+                <div class="quote-box">"发现一个 AE 并不可怕，可怕的是漏报或延迟报告。每一个 AE 数据都是保护患者安全的基石。"</div>
+                <h3>CTCAE 分级速查</h3>
+                <p>1 级（轻度）：无需干预或仅需观察；2 级（中度）：需要局部/非侵入性干预；3 级（重度）：需住院或延长住院时间；4 级（危及生命）：需紧急干预；5 级（死亡）。</p>
+                <h3>SAE 上报时限</h3>
+                <p>获知 SAE 后 24 小时内必须完成初始报告。致死或危及生命的 SAE 需在发现后立即电话通知申办方安全部门，书面报告不超过 24 小时。</p>`,
+            '沟通技巧': `
+                <p>在临床项目中，专员是患者与医疗团队之间的"翻译器"和"缓冲带"。掌握良好的沟通技巧能显著提高患者配合度和数据质量。</p>
+                <div class="quote-box">"好的沟通不是说服患者，而是让患者感到被理解和被尊重。"</div>
+                <h3>应对患者焦虑</h3>
+                <p>治疗初期患者常因副作用预期而焦虑。此时应：1) 充分倾听，不急于给信息；2) 用简单语言解释已有的安全保障措施；3) 如有需要，建议联系心理科或社工介入。</p>
+                <h3>失访召回话术</h3>
+                <p>对于逾期未来院的患者，首次致电以关怀开场而非催促："您好，我是您的项目专员，最近是否有什么不方便的地方？我们很关心您的身体状况……"</p>`,
+            '系统操作': `
+                <p>本文将指导您完成日常工作中最高频的系统操作流程，从患者建档到任务归档，一站式掌握。</p>
+                <div class="quote-box">"系统是工具，流程是保障。熟练的系统操作能让您将更多精力放在患者服务上。"</div>
+                <h3>建档全流程</h3>
+                <p>患者扫码绑定 → 核对身份信息 → 完善病历资料（诊断、分期、既往用药）→ 上传知情同意书照片 → 系统自动分配项目编号并生成随访计划。</p>
+                <h3>任务处理与归档</h3>
+                <p>所有任务按优先级排列在工作台。"高"优先级任务需在当日完成处理。任务完成后，数据自动同步至 EDC 系统。归档后的任务可在"数据报表"中查看历史记录。</p>`
+        };
+
+        if (article) {
+            document.getElementById('catBadge').className = `cat-badge cat-${article.category}`;
+            document.getElementById('catBadge').innerText = article.category;
+            document.getElementById('title').innerText = article.title;
+            document.getElementById('date').innerText = article.date;
+            document.getElementById('readCount').innerText = article.readCount;
+            document.getElementById('articleBody').innerHTML = bodyTemplates[article.category] || '<p>内容加载中…</p>';
+        }
+
+        // 收藏逻辑
+        function updateFavUI() {
+            const btn = document.getElementById('favBtn');
+            const isFav = App.isHelperFavorited(articleId);
+            btn.className = isFav ? 'fav-btn active' : 'fav-btn';
+            btn.innerText = isFav ? '★' : '☆';
+        }
+
+        function toggleFav() {
+            const added = App.toggleHelperFavorite(articleId);
+            updateFavUI();
+            alert(added ? '收藏成功，可在「我的收藏」查看' : '已取消收藏');
+        }
+
+        updateFavUI();
+    </script>
+</body>
+</html>

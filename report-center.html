@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>报表与质控 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .report-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;
+        }
+        .chart-box {
+            background: white; border-radius: 20px; padding: 20px; margin-bottom: 16px;
+            border: 1px solid #F0F2F5; position: relative;
+        }
+        .mini-chart {
+            height: 100px; display: flex; align-items: flex-end; gap: 8px; margin-top: 16px;
+        }
+        .chart-bar {
+            flex: 1; background: var(--primary-soft); border-radius: 4px; transition: height 1s;
+            position: relative;
+        }
+        .chart-bar::after {
+            content: attr(data-label); position: absolute; bottom: -20px; left: 50%;
+            transform: translateX(-50%); font-size: 10px; color: var(--text-muted);
+        }
+        .chart-bar.active { background: var(--primary-gradient); }
+
+        .report-item {
+            display: flex; align-items: center; gap: 16px; padding: 16px 0;
+            border-bottom: 1px solid #F0F2F5;
+        }
+        .report-item:last-child { border-bottom: none; }
+        .file-icon {
+            width: 44px; height: 44px; border-radius: 12px; background: #F0F2F5;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="back-btn" onclick="location.href='index.html'">✕</div>
+        <h1>报表与质控中心</h1>
+    </div>
+
+    <div class="container">
+        <!-- 核心统计 -->
+        <div class="report-grid animate-up">
+            <div class="card" style="margin-bottom:0">
+                <div style="font-size: 12px; color: var(--text-muted);">质控合格率</div>
+                <div style="font-size: 24px; font-weight: 700; color: var(--success-color); margin: 4px 0;">98.2%</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">高于平均 2.4% ↑</div>
+            </div>
+            <div class="card" style="margin-bottom:0">
+                <div style="font-size: 12px; color: var(--text-muted);">随访逾期率</div>
+                <div style="font-size: 24px; font-weight: 700; color: var(--danger-color); margin: 4px 0;">3.1%</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">较上月下降 0.5% ↓</div>
+            </div>
+        </div>
+
+        <!-- 入组趋势图表 -->
+        <div class="chart-box animate-up" style="animation-delay: 0.1s; margin-bottom: 24px;">
+            <h3 style="font-size: 15px; font-weight: 700;">入组趋势 (近6月)</h3>
+            <div class="mini-chart">
+                <div class="chart-bar" style="height: 30%" data-label="11月"></div>
+                <div class="chart-bar" style="height: 45%" data-label="12月"></div>
+                <div class="chart-bar" style="height: 60%" data-label="1月"></div>
+                <div class="chart-bar" style="height: 55%" data-label="2月"></div>
+                <div class="chart-bar" style="height: 80%" data-label="3月"></div>
+                <div class="chart-bar active" style="height: 95%" data-label="4月"></div>
+            </div>
+            <div style="margin-top: 30px; display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                <span>目标：120 标本</span>
+                <span>当前：84 标本 (70%)</span>
+            </div>
+        </div>
+
+        <!-- 周月报下载 -->
+        <div class="section-title animate-up" style="animation-delay: 0.2s;" id="reports">
+            数据报告下载
+        </div>
+        <div class="card animate-up" style="animation-delay: 0.25s; padding: 0 20px;">
+            <div class="report-item-v2" onclick="alert('预览: 2024年4月第三周项目简报')">
+                <div class="file-icon-box" style="background:#EBF5FF; color:#1890FF">📊</div>
+                <div class="report-info">
+                    <div class="report-title">2024-W16 项目周报</div>
+                    <div class="report-meta">
+                        <span class="report-tag">PDF</span>
+                        <span class="report-tag">2.4MB</span>
+                        <span class="report-tag">2024-04-19</span>
+                    </div>
+                </div>
+                <div class="download-btn">↓</div>
+            </div>
+            <div class="report-item-v2" onclick="alert('预览: 2024年3月度数据质控报告')">
+                <div class="file-icon-box" style="background:#FFF2E6; color:#FA8C16">📋</div>
+                <div class="report-info">
+                    <div class="report-title">2024-M03 质控月报</div>
+                    <div class="report-meta">
+                        <span class="report-tag">PDF</span>
+                        <span class="report-tag">5.8MB</span>
+                        <span class="report-tag">2024-04-01</span>
+                    </div>
+                </div>
+                <div class="download-btn">↓</div>
+            </div>
+            <div class="report-item-v2" onclick="alert('预览: 院内协同沟通记录汇总')">
+                <div class="file-icon-box" style="background:#EAF7F1; color:#2BA471">👥</div>
+                <div class="report-info">
+                    <div class="report-title">院内协同情况汇总.xlsx</div>
+                    <div class="report-meta">
+                        <span class="report-tag">XLSX</span>
+                        <span class="report-tag">1.1MB</span>
+                        <span class="report-tag">2024-04-15</span>
+                    </div>
+                </div>
+                <div class="download-btn">↓</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 Tab 栏 -->
+    <nav class="tab-bar">
+        <a href="index.html" class="tab-item">
+            <span class="tab-icon">🏠</span>
+            <span>首页</span>
+        </a>
+        <a href="task-list.html" class="tab-item">
+            <span class="tab-icon" style="position: relative;">📋 <span class="badge">14</span></span>
+            <span>任务管理</span>
+        </a>
+        <a href="#" class="tab-item active">
+            <span class="tab-icon">📊</span>
+            <span>数据报表</span>
+        </a>
+        <a href="my.html" class="tab-item">
+            <span class="tab-icon">👤</span>
+            <span>我的</span>
+        </a>
+    </nav>
+</body>
+</html>

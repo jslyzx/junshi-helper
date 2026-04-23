@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>个人中心 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .my-header {
+            background: var(--primary-gradient); padding: 40px 20px 30px; color: white;
+            border-radius: 0 0 30px 30px; margin-bottom: 24px;
+        }
+        .user-profile { display: flex; align-items: center; gap: 16px; }
+        .avatar-lg { width: 72px; height: 72px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); }
+        
+        .menu-list { background: white; border-radius: 20px; overflow: hidden; margin-bottom: 16px; border: 1px solid #F0F2F5; }
+        .menu-item {
+            display: flex; align-items: center; justify-content: space-between; padding: 18px 20px;
+            border-bottom: 1px solid #F7F8FA; cursor: pointer;
+        }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:active { background: #F9FAFB; }
+        .menu-label { display: flex; align-items: center; gap: 12px; font-size: 15px; color: var(--text-main); }
+        .menu-icon { font-size: 20px; }
+    </style>
+</head>
+<body>
+    <div class="my-header animate-up">
+        <div class="user-profile">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mimi" class="avatar-lg">
+            <div>
+                <h2 style="font-size: 20px;">陈美琳</h2>
+                <p style="font-size: 13px; opacity: 0.8; margin-top: 4px;">工号：JS-9527 | 项目专员</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="padding-top: 0;">
+        <div class="menu-list animate-up" style="animation-delay: 0.1s;">
+            <div class="menu-item">
+                <div class="menu-label"><span class="menu-icon">🏢</span> <span>所属中心</span></div>
+                <div style="font-size: 14px; color: var(--text-muted);">华东中心 - 瑞金医院</div>
+            </div>
+            <div class="menu-item" onclick="App.navigateTo('project-file.html')">
+                <div class="menu-label"><span class="menu-icon">📁</span> <span>项目档案</span></div>
+                <span style="color: #CBCDD1;">›</span>
+            </div>
+        </div>
+
+        <div class="menu-list animate-up" style="animation-delay: 0.15s;">
+            <div class="menu-item" onclick="App.navigateTo('messages.html')">
+                <div class="menu-label"><span class="menu-icon">🔔</span> <span>消息提醒</span></div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span id="myMsgBadge" style="background: var(--danger-color); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; display: none;">2</span>
+                    <span style="color: #CBCDD1;">›</span>
+                </div>
+            </div>
+            <div class="menu-item" onclick="App.navigateTo('helper-favorites.html')">
+                <div class="menu-label"><span class="menu-icon">⭐</span> <span>我的收藏</span></div>
+                <span style="color: #CBCDD1;">›</span>
+            </div>
+            <div class="menu-item" onclick="alert('系统设置')">
+                <div class="menu-label"><span class="menu-icon">⚙️</span> <span>设置</span></div>
+                <span style="color: #CBCDD1;">›</span>
+            </div>
+        </div>
+
+        <div class="menu-list animate-up" style="animation-delay: 0.2s;">
+            <div class="menu-item" style="justify-content: center;" onclick="App.logout()">
+                <span style="color: var(--danger-color); font-weight: 600;">退出登录</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 Tab 栏 -->
+    <nav class="tab-bar">
+        <a href="index.html" class="tab-item">
+            <span class="tab-icon">🏠</span>
+            <span>首页</span>
+        </a>
+        <a href="task-list.html" class="tab-item">
+            <span class="tab-icon" style="position: relative;">📋 <span class="badge">14</span></span>
+            <span>任务管理</span>
+        </a>
+        <a href="report-center.html" class="tab-item">
+            <span class="tab-icon">📊</span>
+            <span>数据报表</span>
+        </a>
+        <a href="#" class="tab-item active">
+            <span class="tab-icon">👤</span>
+            <span>我的</span>
+        </a>
+    </nav>
+
+    <script src="js/app.js"></script>
+    <script>
+        function renderMyPage() {
+            const msgCount = App.getUnreadCount();
+            const badge = document.getElementById('myMsgBadge');
+            if (msgCount > 0) {
+                badge.innerText = msgCount;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', renderMyPage);
+    </script>
+</body>
+</html>

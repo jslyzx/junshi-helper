@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>异常回流处置 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .step-indicator { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+        .step-indicator::before { content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 2px; background: #E5E6EB; z-index: 1; }
+        .step-dot {
+            width: 32px; height: 32px; border-radius: 50%; background: white; border: 2px solid #E5E6EB;
+            display: flex; align-items: center; justify-content: center; z-index: 2; font-size: 12px; font-weight: 700; color: var(--text-muted);
+            transition: all 0.3s;
+        }
+        .step-dot.active { background: #7367F0; border-color: #7367F0; color: white; }
+        .step-dot.completed { background: #F3F2FD; border-color: #7367F0; color: #7367F0; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
+        .form-input {
+            width: 100%; height: 48px; border-radius: 12px; border: 1px solid #E5E6EB; padding: 0 16px;
+            font-size: 15px; font-family: inherit; transition: border-color 0.2s; background: white;
+        }
+        .form-input:focus { outline: none; border-color: #7367F0; background: #F9F8FF; }
+        
+        .alert-box {
+            background: rgba(115, 103, 240, 0.08); border-left: 3px solid #7367F0; 
+            padding: 12px 16px; border-radius: 8px; margin-bottom: 20px;
+            font-size: 13px; color: var(--text-main);
+        }
+
+        .btn-group {
+            position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; padding-bottom: calc(20px + var(--safe-area-bottom));
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid #F0F2F5; display: flex; gap: 12px; z-index: 100;
+        }
+        .btn-flex { flex: 1; height: 50px; border-radius: 14px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-flex:active { transform: scale(0.96); opacity: 0.9; }
+        .btn-outline { background: #F2F3F5; color: var(--text-secondary); }
+        .btn-primary { background: linear-gradient(135deg, #7367F0 0%, #4E44BD 100%); color: white; box-shadow: 0 12px 32px rgba(115, 103, 240, 0.2); }
+    </style>
+</head>
+<body>
+    <div class="header" style="position: sticky; top: 0; z-index: 10;">
+        <div class="back-btn" onclick="history.back()">✕</div>
+        <h1>异常回流处置</h1>
+    </div>
+
+    <div class="container" style="padding-bottom: 120px;">
+        <div class="step-indicator">
+            <div class="step-dot active">1</div>
+            <div class="step-dot">2</div>
+            <div class="step-dot">3</div>
+        </div>
+
+        <!-- 步骤 1: 异常确认 -->
+        <div id="step1" class="animate-up">
+            <div class="section-title">回流异常触发点</div>
+            <div class="card">
+                <div class="alert-box">
+                    <strong>系统提示：</strong> 检测到患者【陈*生】的 D14 血常规实验室检查中，白细胞计数低于项目安全阈值。
+                </div>
+                <div class="form-group">
+                    <label class="form-label">异常类型界定</label>
+                    <select class="form-input">
+                        <option>实验室/影像学指标异常 (Lab/Image)</option>
+                        <option selected>不良事件严重性升级 (AE Upgrade)</option>
+                        <option>患者自报严重不适 (ePRO Alert)</option>
+                        <option>合并用药禁忌违规</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">异常触发来源</label>
+                    <input type="text" class="form-input" value="中心实验室数据接口自动识别" readonly style="background: #F2F3F5; color: var(--text-muted);">
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤 2: 详情定级 -->
+        <div id="step2" class="hidden">
+            <div class="section-title">详情与初步定级</div>
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">CTCAE 毒性初步分级判断</label>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn-flex btn-outline" style="min-width: 45%; height: 40px; font-size: 13px;">1 级 (轻度)</button>
+                        <button class="btn-flex btn-outline" style="min-width: 45%; height: 40px; font-size: 13px;">2 级 (中度)</button>
+                        <button class="btn-flex btn-outline" style="min-width: 45%; height: 40px; font-size: 13px; background: #F3F2FD; border-color: #7367F0; color: #7367F0;">3 级 (重度)</button>
+                        <button class="btn-flex btn-outline" style="min-width: 45%; height: 40px; font-size: 13px; border-color: #EA5455; color: #EA5455;">4 级 (危及生命)</button>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">中心化核查说明</label>
+                    <textarea class="form-input" style="height: 100px; padding-top: 12px; resize: none;" placeholder="填写您复核原始病历或联系患者后的初步确认结果...例如：患者无明显发热，但伴随乏力"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤 3: 汇报与干预 -->
+        <div id="step3" class="hidden">
+            <div class="section-title">干预行动记录</div>
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">研究者(PI/Sub-I)汇报状态</label>
+                    <select class="form-input">
+                        <option>已向研究医生团队口头/微信汇报</option>
+                        <option>已在 EDC 系统提交医学质询</option>
+                        <option>医生已处理开具新医嘱</option>
+                        <option>暂未汇报 (不建议及高风险级别)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">临床干预决策</label>
+                    <select class="form-input">
+                        <option>暂不干预，提升随访频率</option>
+                        <option>暂停试验用药 (Drug Interruption)</option>
+                        <option>下调药物剂量 (Dose Reduction)</option>
+                        <option>永久停药退排 (Discontinue)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">随访频率更新</label>
+                    <input type="text" class="form-input" placeholder="例如：由每 3 周改为每周电话随访">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-flex btn-outline" id="prevBtn" onclick="prevStep()" style="display: none;">上一步</button>
+        <button class="btn-flex btn-primary" id="nextBtn" onclick="nextStep()">核查完毕进入下一步</button>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function nextStep() {
+            if (currentStep < 3) {
+                document.getElementById(`step${currentStep}`).classList.add('hidden');
+                document.getElementById(`step${currentStep}`).classList.remove('animate-up');
+                
+                const dots = document.querySelectorAll('.step-dot');
+                dots[currentStep-1].classList.remove('active');
+                dots[currentStep-1].classList.add('completed');
+                
+                currentStep++;
+                
+                const nextSection = document.getElementById(`step${currentStep}`);
+                nextSection.classList.remove('hidden');
+                void nextSection.offsetWidth; 
+                nextSection.classList.add('animate-up');
+                
+                dots[currentStep-1].classList.add('active');
+                
+                updateBtns();
+                window.scrollTo(0, 0);
+            } else {
+                alert('异常处置记录已流转至临床决策系统！');
+                window.location.href = 'index.html';
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step${currentStep}`).classList.add('hidden');
+                document.getElementById(`step${currentStep}`).classList.remove('animate-up');
+                
+                const dots = document.querySelectorAll('.step-dot');
+                dots[currentStep-1].classList.remove('active');
+
+                currentStep--;
+                
+                const prevSection = document.getElementById(`step${currentStep}`);
+                prevSection.classList.remove('hidden');
+                void prevSection.offsetWidth;
+                prevSection.classList.add('animate-up');
+                
+                dots[currentStep-1].classList.remove('completed');
+                dots[currentStep-1].classList.add('active');
+
+                updateBtns();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function updateBtns() {
+            document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
+            document.getElementById('nextBtn').innerText = currentStep === 3 ? '形成报告并提交' : '核查完毕进入下一步';
+        }
+    </script>
+</body>
+</html>
