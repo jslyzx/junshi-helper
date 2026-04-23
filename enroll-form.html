@@ -6,47 +6,75 @@
     <title>现场入组 - 项目专员端</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .step-indicator {
-            display: flex; justify-content: space-between; margin-bottom: 30px; position: relative;
+        .doc-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px;
         }
-        .step-indicator::before {
-            content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 2px;
-            background: #E5E6EB; z-index: 1;
+        .doc-upload-card {
+            background: white; border-radius: 20px; padding: 20px 16px;
+            border: 2px dashed rgba(43, 164, 113, 0.15); text-align: center;
+            cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
         }
-        .step-dot {
-            width: 32px; height: 32px; border-radius: 50%; background: white; border: 2px solid #E5E6EB;
-            display: flex; align-items: center; justify-content: center; z-index: 2; font-size: 12px; font-weight: 700; color: var(--text-muted);
+        .doc-upload-card:active { transform: scale(0.96); }
+        .doc-upload-card.uploaded {
+            border-style: solid; border-color: var(--success-color);
+            background: #F0FFF4;
         }
-        .step-dot.active { background: var(--primary-color); border-color: var(--primary-color); color: white; }
-        .step-dot.completed { background: var(--primary-light); border-color: var(--primary-color); color: var(--primary-color); }
+        .doc-upload-card .doc-icon {
+            width: 52px; height: 52px; border-radius: 16px; margin: 0 auto 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+        }
+        .doc-upload-card .doc-name { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        .doc-upload-card .doc-hint { font-size: 11px; color: var(--text-muted); }
+        .doc-upload-card .doc-check {
+            display: none; position: absolute; top: 10px; right: 10px;
+            width: 22px; height: 22px; border-radius: 50%; background: var(--success-color);
+            color: white; font-size: 12px; line-height: 22px; text-align: center;
+        }
+        .doc-upload-card.uploaded .doc-check { display: block; }
+        .doc-upload-card .doc-thumb {
+            display: none; width: 100%; height: 60px; object-fit: cover;
+            border-radius: 8px; margin-top: 8px;
+        }
+        .doc-upload-card.uploaded .doc-thumb { display: block; }
 
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
+        .consent-multi-area {
+            margin-top: 14px; padding: 16px; background: white;
+            border-radius: 20px; border: 1px solid #F0F2F5;
+        }
+        .consent-pages { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+        .consent-page-item {
+            position: relative; flex-shrink: 0; width: 80px; height: 106px;
+            border-radius: 12px; overflow: hidden; border: 1px solid #E5E6EB;
+        }
+        .consent-page-item img { width: 100%; height: 100%; object-fit: cover; }
+        .consent-page-num {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.5); color: white; font-size: 10px;
+            text-align: center; padding: 2px 0;
+        }
+
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-main); }
         .form-input {
             width: 100%; height: 48px; border-radius: 12px; border: 1px solid #E5E6EB; padding: 0 16px;
-            font-size: 15px; font-family: inherit; transition: border-color 0.2s;
-        }
-        .form-input:focus { outline: none; border-color: var(--primary-color); background: var(--primary-soft); }
-
-        .upload-card {
-            border: 2px dashed #E5E6EB; border-radius: 16px; padding: 30px; text-align: center; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .upload-card:active { background: var(--primary-soft); border-color: var(--primary-color); }
-
-        .signature-pad {
-            width: 100%; height: 200px; background: #F7F8FA; border-radius: 16px; border: 1px solid #E5E6EB;
-            display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 13px;
-            position: relative; overflow: hidden;
+            font-size: 15px; font-family: inherit; transition: border-color 0.2s; background: white;
         }
 
-        .btn-group {
-            position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; padding-bottom: calc(20px + var(--safe-area-bottom));
-            background: white; border-top: 1px solid #F0F2F5; display: flex; gap: 12px;
+        .viewer-modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(10px);
         }
-        .btn-flex { flex: 1; height: 50px; border-radius: 14px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; }
-        .btn-outline { background: #F2F3F5; color: var(--text-secondary); }
-        .btn-primary { background: var(--primary-gradient); color: white; }
+        .viewer-modal.active { display: flex; }
+        .viewer-img { max-width: 95%; max-height: 85%; object-fit: contain; border-radius: 8px; }
+        .viewer-close { position: absolute; top: 40px; right: 25px; color: white; font-size: 24px; z-index: 2010; }
+
+        .btn-primary { 
+            width: 100%; height: 52px; border-radius: 16px; border: none; font-size: 16px; font-weight: 700; cursor: pointer;
+            background: var(--primary-gradient); color: white; box-shadow: 0 8px 20px rgba(43,164,113,0.2);
+            margin-top: 24px;
+        }
     </style>
 </head>
 <body>
@@ -55,130 +83,172 @@
         <h1>患者现场入组</h1>
     </div>
 
-    <div class="container">
-        <!-- 步骤进度 -->
-        <div class="step-indicator">
-            <div class="step-dot active">1</div>
-            <div class="step-dot">2</div>
-            <div class="step-dot">3</div>
+    <div class="container animate-up">
+        <!-- 上传材料区 - 复用协助上传组件 -->
+        <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 1px;">上传材料</div>
+        <div class="doc-grid">
+            <div class="doc-upload-card" id="card-idcard" onclick="triggerUpload('idcard')">
+                <div class="doc-icon" style="background: #EAF7F1;">🪪</div>
+                <div class="doc-name">身份证正面</div>
+                <div class="doc-hint">必传 · 拍照上传</div>
+                <div class="doc-check">✓</div>
+                <img class="doc-thumb" id="thumb-idcard" onclick="event.stopPropagation(); openViewer(this.src)">
+            </div>
+            <div class="doc-upload-card" id="card-diagnosis" onclick="triggerUpload('diagnosis')">
+                <div class="doc-icon" style="background: #FFF2E6;">📋</div>
+                <div class="doc-name">诊断证明</div>
+                <div class="doc-hint">必传 · 拍照上传</div>
+                <div class="doc-check">✓</div>
+                <img class="doc-thumb" id="thumb-diagnosis" onclick="event.stopPropagation(); openViewer(this.src)">
+            </div>
+            <div class="doc-upload-card" id="card-prescription" onclick="triggerUpload('prescription')">
+                <div class="doc-icon" style="background: #E8F8E8;">💊</div>
+                <div class="doc-name">处方单</div>
+                <div class="doc-hint">选传 · 拍照上传</div>
+                <div class="doc-check">✓</div>
+                <img class="doc-thumb" id="thumb-prescription" onclick="event.stopPropagation(); openViewer(this.src)">
+            </div>
+            <div class="doc-upload-card" id="card-consent" onclick="triggerConsentUpload()">
+                <div class="doc-icon" style="background: #F3E8FF;">🖋️</div>
+                <div class="doc-name">知情同意书</div>
+                <div class="doc-hint" id="consent-hint">必传 · 支持多页</div>
+                <div class="doc-check">✓</div>
+                <img class="doc-thumb" style="display:none">
+            </div>
         </div>
 
-        <!-- 步骤 1: 基础资料 -->
-        <div id="step1">
-            <div class="section-title">基础身份信息</div>
+        <!-- 知情同意书多页预览区 -->
+        <div class="consent-multi-area" id="consentMultiArea" style="display: none;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <span style="font-size: 14px; font-weight: 700;">🖋️ 知情同意书</span>
+                <span style="font-size: 12px; color: var(--text-muted);" id="consentCountText">已上传 0 页</span>
+            </div>
+            <div class="consent-pages" id="consentPages">
+                <!-- 由 JS 渲染 -->
+            </div>
+        </div>
+
+        <!-- 识别结果核对 -->
+        <div id="ocrResult" class="hidden animate-up" style="margin-top: 24px;">
+            <div class="section-title">识别核对</div>
             <div class="card">
                 <div class="form-group">
                     <label class="form-label">患者姓名</label>
-                    <input type="text" class="form-input" placeholder="输入真实姓名">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">性别</label>
-                    <div style="display: flex; gap: 12px;">
-                        <button class="btn-flex btn-outline" style="background: var(--primary-soft); border-color: var(--primary-color); color: var(--primary-color);">男</button>
-                        <button class="btn-flex btn-outline">女</button>
-                    </div>
+                    <input type="text" class="form-input" id="r-name" placeholder="待识别">
                 </div>
                 <div class="form-group">
                     <label class="form-label">身份证号</label>
-                    <input type="text" class="form-input" placeholder="用于系统自动校验">
+                    <input type="text" class="form-input" id="r-idcard" placeholder="待识别">
                 </div>
-            </div>
-
-            <div class="section-title">项目分组</div>
-            <div class="card">
                 <div class="form-group">
-                    <label class="form-label">所属组别</label>
-                    <select class="form-input">
-                        <option>试验组 (ADC 高剂量)</option>
-                        <option>对照组 (标准疗法)</option>
-                    </select>
+                    <label class="form-label">确诊疾病</label>
+                    <input type="text" class="form-input" id="r-disease" placeholder="待识别">
                 </div>
             </div>
         </div>
 
-        <!-- 步骤 2: 附件上传 (隐藏) -->
-        <div id="step2" class="hidden">
-            <div class="section-title">知情同意书拍照</div>
-            <div class="card">
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">请拍摄已签字的《患者知情同意书》首页，确保字迹清晰且包含日期。</p>
-                <div class="upload-card" onclick="simulateUpload(this)">
-                    <div style="font-size: 32px; margin-bottom: 8px;">📷</div>
-                    <div style="font-size: 14px; font-weight: 600;">点击拍照/上传</div>
-                </div>
-                <div id="uploadPreview" class="hidden" style="margin-top: 16px; position: relative;">
-                    <img src="https://images.unsplash.com/photo-1586762493833-2895f3484f47?q=80&w=400" style="width: 100%; border-radius: 12px;">
-                    <div style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.5); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✕</div>
-                </div>
-            </div>
-        </div>
+        <button class="btn-primary" onclick="handleSubmit()">确认提交入组</button>
+        <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 16px; padding-bottom: 30px;">
+            提交后资料将进入中心质控审核流程
+        </p>
 
-        <!-- 步骤 3: 电子签名 (隐藏) -->
-        <div id="step3" class="hidden">
-            <div class="section-title">专员确认签名</div>
-            <div class="card">
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">我已对上述患者进行身份核实，并确认其符合入组标准。</p>
-                <div class="signature-pad" onclick="simulateSignature(this)">
-                    点击此处手写签名
-                </div>
-            </div>
-        </div>
+        <input type="file" id="fileInput" hidden accept="image/*" capture="environment">
+        <input type="file" id="consentFileInput" hidden accept="image/*" capture="environment">
     </div>
 
-    <!-- 底部按钮 -->
-    <div class="btn-group">
-        <button class="btn-flex btn-outline" id="prevBtn" onclick="prevStep()" style="display: none;">上一步</button>
-        <button class="btn-flex btn-primary" id="nextBtn" onclick="nextStep()">下一步</button>
+    <!-- 全屏预览 -->
+    <div id="imageViewer" class="viewer-modal" onclick="closeViewer()">
+        <div class="viewer-close">✕</div>
+        <img id="viewerImg" class="viewer-img">
     </div>
 
     <script>
-        let currentStep = 1;
+        let currentUploadType = '';
+        const consentPages = [];
 
-        function nextStep() {
-            if (currentStep < 3) {
-                document.getElementById(`step${currentStep}`).classList.add('hidden');
-                const dots = document.querySelectorAll('.step-dot');
-                dots[currentStep-1].classList.remove('active');
-                dots[currentStep-1].classList.add('completed');
+        function triggerUpload(type) {
+            currentUploadType = type;
+            document.getElementById('fileInput').click();
+        }
+
+        function triggerConsentUpload() {
+            document.getElementById('consentFileInput').click();
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            if (!e.target.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const src = event.target.result;
+                const card = document.getElementById(`card-${currentUploadType}`);
+                card.classList.add('uploaded');
+                const thumb = document.getElementById(`thumb-${currentUploadType}`);
+                thumb.src = src;
                 
-                currentStep++;
-                document.getElementById(`step${currentStep}`).classList.remove('hidden');
-                dots[currentStep-1].classList.add('active');
-                
-                updateBtns();
-            } else {
-                alert('入组申请已提交！正在等待数据质控审核。');
-                window.location.href = 'index.html';
+                // 模拟 OCR
+                if (currentUploadType === 'idcard') {
+                    document.getElementById('r-name').value = '林建国';
+                    document.getElementById('r-idcard').value = '310115199203151234';
+                } else if (currentUploadType === 'diagnosis') {
+                    document.getElementById('r-disease').value = '晚期实体瘤 (ADC 研究)';
+                }
+                document.getElementById('ocrResult').classList.remove('hidden');
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        document.getElementById('consentFileInput').addEventListener('change', function(e) {
+            if (!e.target.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                consentPages.push(event.target.result);
+                renderConsentPages();
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        function renderConsentPages() {
+            document.getElementById('consentMultiArea').style.display = 'block';
+            document.getElementById('card-consent').classList.add('uploaded');
+            document.getElementById('consentCountText').innerText = `已上传 ${consentPages.length} 页`;
+            
+            const container = document.getElementById('consentPages');
+            let html = consentPages.map((src, i) => `
+                <div class="consent-page-item" onclick="openViewer('${src}')">
+                    <img src="${src}">
+                    <div class="consent-page-num">${i + 1}</div>
+                </div>
+            `).join('');
+            
+            html += `
+                <div class="doc-upload-card" style="width: 80px; height: 106px; flex-shrink: 0;" onclick="triggerConsentUpload()">
+                    <div style="font-size: 20px;">+</div>
+                    <div style="font-size: 10px;">添加</div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function openViewer(src) {
+            document.getElementById('viewerImg').src = src;
+            document.getElementById('imageViewer').classList.add('active');
+        }
+
+        function closeViewer() {
+            document.getElementById('imageViewer').classList.remove('active');
+        }
+
+        function handleSubmit() {
+            if (!document.getElementById('r-name').value) {
+                alert('请先上传身份证识别基础信息');
+                return;
             }
-        }
-
-        function prevStep() {
-            if (currentStep > 1) {
-                document.getElementById(`step${currentStep}`).classList.add('hidden');
-                const dots = document.querySelectorAll('.step-dot');
-                dots[currentStep-1].classList.remove('active');
-
-                currentStep--;
-                document.getElementById(`step${currentStep}`).classList.remove('hidden');
-                dots[currentStep-1].classList.remove('completed');
-                dots[currentStep-1].classList.add('active');
-
-                updateBtns();
+            if (consentPages.length === 0) {
+                alert('请至少上传一页知情同意书');
+                return;
             }
-        }
-
-        function updateBtns() {
-            document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
-            document.getElementById('nextBtn').innerText = currentStep === 3 ? '确认提交' : '下一步';
-        }
-
-        function simulateUpload(el) {
-            el.classList.add('hidden');
-            document.getElementById('uploadPreview').classList.remove('hidden');
-        }
-
-        function simulateSignature(el) {
-            el.innerHTML = '<span style="font-family: cursive; font-size: 40px; color: #333; transform: rotate(-5deg); display: block;">陈美琳</span>';
-            el.style.background = 'white';
+            alert('现场入组申请已提交！正在等待质控审核。');
+            window.location.href = 'index.html';
         }
     </script>
 </body>

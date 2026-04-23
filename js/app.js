@@ -34,13 +34,13 @@ const MockData = {
         ]
     },
     todoList: [
-        { id: 0, type: "材料待确认", patient: "林*国", priority: "med", desc: "患者已绑定，尚未上传入组资料", time: "刚刚" },
+        { id: 0, type: "材料待上传", patient: "林*国", priority: "med", desc: "患者已绑定，尚未上传入组资料", time: "刚刚" },
         { id: 1, type: "现场入组", patient: "张*华", priority: "high", desc: "需核对知情同意书签字", time: "10:30" },
         { id: 2, type: "周期提醒", patient: "李*明", priority: "med", desc: "D21 访视提醒（短信已发）", time: "14:00" },
         { id: 3, type: "异常回流", patient: "陈*生", priority: "high", desc: "AE 回流：皮疹数据漏填", time: "15:30" },
         { id: 4, type: "失访召回", patient: "张*兰", priority: "low", desc: "失访召回：第二次电话联系", time: "明天" },
         { id: 5, type: "首周期教育", patient: "曹*云", priority: "high", desc: "ADC 药物输注后教育", time: "剩余 2小时" },
-        { id: 6, type: "标准随访", patient: "刘*财", priority: "med", desc: "D14 实验室检查检查单核对", time: "已逾期 1天" }
+        { id: 6, type: "现场补访", patient: "刘*财", priority: "med", desc: "D14 实验室检查检查单核对", time: "已逾期 1天" }
     ],
     // 患者列表数据
     patients: [
@@ -48,7 +48,7 @@ const MockData = {
         { id: 102, name: "张英杰", age: 45, status: "待入组", statusTag: "warning", phone: "138****3344", enrollDate: "-", disease: "实体瘤", cycle: "-" },
         { id: 103, name: "王丽华", age: 61, status: "已结项", statusTag: "muted", phone: "135****7766", enrollDate: "2024-02-10", disease: "尿路上皮癌", cycle: "Done" },
         { id: 104, name: "曹静云", age: 48, status: "AE 回流", statusTag: "danger", phone: "173****0000", enrollDate: "2024-04-01", disease: "NSCLC", cycle: "C1D1" },
-        { id: 105, name: "刘建国", age: 55, status: "标准随访", statusTag: "info", phone: "139****2233", enrollDate: "2023-11-20", disease: "晚期胃癌", cycle: "C8D14" }
+        { id: 105, name: "刘建国", age: 55, status: "现场补访", statusTag: "info", phone: "139****2233", enrollDate: "2023-11-20", disease: "晚期胃癌", cycle: "C8D14" }
     ],
     // 患者全景时间轴
     timeline: [

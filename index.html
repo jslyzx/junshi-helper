@@ -201,8 +201,12 @@
             }
 
             const list = document.getElementById('todoList');
-            list.innerHTML = todos.map(item => `
-                <div class="todo-item ${item.type === '异常回流' ? 'is-abnormal' : ''}" onclick="App.navigateTo('task-detail.html?id=${item.id}')">
+            list.innerHTML = todos.map(item => {
+                const isUploadTask = item.type === '材料待上传';
+                const clickAction = isUploadTask ? `App.navigateTo('upload-docs.html?id=${item.id}')` : `App.navigateTo('task-detail.html?id=${item.id}')`;
+                
+                return `
+                <div class="todo-item ${item.type === '异常回流' ? 'is-abnormal' : ''}" onclick="${clickAction}">
                     <div class="todo-info">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="priority-tag priority-${item.priority}">${item.priority === 'high' ? '高' : (item.priority === 'med' ? '中' : '低')}</span>
@@ -212,10 +216,10 @@
                     </div>
                     <div style="text-align: right;">
                         <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">${item.time}</div>
-                        <div class="todo-action">${item.type === '异常回流' ? '上报' : (item.type === '材料待确认' ? '协助' : '处理')}</div>
+                        <div class="todo-action">${item.type === '异常回流' ? '上报' : (isUploadTask ? '上传' : '处理')}</div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         document.addEventListener('DOMContentLoaded', renderPage);
