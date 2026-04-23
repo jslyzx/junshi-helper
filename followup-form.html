@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>标准随访记录 - 项目专员端</title>
+    <title>现场补访记录 - 项目专员端</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .step-indicator {
@@ -53,7 +53,7 @@
 <body>
     <div class="header" style="position: sticky; top: 0; z-index: 10;">
         <div class="back-btn" onclick="history.back()">✕</div>
-        <h1>标准随访录入</h1>
+        <h1>现场补访录入</h1>
     </div>
 
     <div class="container" style="padding-bottom: 120px;">
@@ -66,16 +66,44 @@
 
         <!-- 步骤 1: 患者与基础体征 -->
         <div id="step1" class="animate-up">
-            <div class="section-title">随访对象确认</div>
+            <div class="section-title">补访对象确认</div>
             <div class="card">
                 <div class="form-group">
-                    <label class="form-label">选择患者关联</label>
+                    <label class="form-label">待补访患者</label>
                     <select class="form-input">
                         <option value="">请选择患者...</option>
-                        <option value="1" selected>刘*财 (D14 实验室检查检查单核对)</option>
-                        <option value="2">张*兰 (失访召回后随访)</option>
-                        <option value="3">李*明 (D21 随访登记)</option>
+                        <option value="1" selected>刘*财 (D14 实验室检查单核对)</option>
+                        <option value="2">张*兰 (失访召回后补访)</option>
+                        <option value="3">李*明 (D21 补访登记)</option>
                     </select>
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label class="form-label">补访地点</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" class="form-input" value="上海交通大学附属瑞金医院" style="flex: 1;">
+                        <button class="btn-flex btn-outline" style="width: 50px; flex: none;">📍</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">补访合规记录</div>
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">补访原因说明</label>
+                    <select class="form-input">
+                        <option>常规随访未能如期完成</option>
+                        <option>临床关键指标（AE/SAE）需现场核实</option>
+                        <option>原始病历资料现场核对</option>
+                        <option>失访患者现场寻访</option>
+                        <option>其他原因</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label class="form-label">访视签到照片</label>
+                    <div style="width: 100px; height: 100px; border: 1.5px dashed #E5E6EB; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; background: #F9FAFB;">
+                        <span style="font-size: 24px;">📸</span>
+                        <span style="font-size: 10px; margin-top: 4px;">拍照上传</span>
+                    </div>
                 </div>
             </div>
 
@@ -201,7 +229,7 @@
                 updateBtns();
                 window.scrollTo(0, 0);
             } else {
-                alert('随访记录已提交并同步 EDC 系统！');
+                alert('现场补访记录已提交并同步临床系统！');
                 window.location.href = 'index.html';
             }
         }
