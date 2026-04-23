@@ -61,7 +61,7 @@
         </div>
 
         <!-- 核心统计 -->
-        <div class="stats-grid animate-up" style="animation-delay: 0.1s;">
+        <div class="stats-grid animate-up" style="animation-delay: 0.1s; cursor: pointer;" onclick="App.navigateTo('patient-list.html')">
             <div class="stats-item">
                 <div class="stats-value" id="statTotal">84</div>
                 <div class="stats-label">管理患者</div>
@@ -126,13 +126,13 @@
         </div>
 
         <div class="action-grid animate-up" style="animation-delay: 0.25s;">
+            <div class="action-btn" onclick="App.navigateTo('patient-list.html')">
+                <div class="action-icon bg-teal">👥</div>
+                <div class="action-label">患者管理</div>
+            </div>
             <div class="action-btn" onclick="App.navigateTo('abnormal-form.html')">
                 <div class="action-icon bg-purple">⚠️</div>
                 <div class="action-label">异常回流</div>
-            </div>
-            <div class="action-btn" onclick="App.navigateTo('report-center.html')">
-                <div class="action-icon bg-teal">📊</div>
-                <div class="action-label">数据质控</div>
             </div>
             <div class="action-btn" onclick="App.navigateTo('task-list.html?type=remind')">
                 <div class="action-icon bg-blue" style="filter: hue-rotate(45deg);">⏰</div>
@@ -164,6 +164,10 @@
         <a href="#" class="tab-item" onclick="App.navigateTo('task-list.html')">
             <span class="tab-icon" style="position: relative;">📋 <span class="badge">14</span></span>
             <span>任务管理</span>
+        </a>
+        <a href="#" class="tab-item" onclick="App.navigateTo('patient-list.html')">
+            <span class="tab-icon">👥</span>
+            <span>患者管理</span>
         </a>
         <a href="#" class="tab-item" onclick="App.navigateTo('report-center.html')">
             <span class="tab-icon">📊</span>
@@ -198,7 +202,7 @@
 
             const list = document.getElementById('todoList');
             list.innerHTML = todos.map(item => `
-                <div class="todo-item" onclick="App.navigateTo('task-detail.html?id=${item.id}')">
+                <div class="todo-item ${item.type === '异常回流' ? 'is-abnormal' : ''}" onclick="App.navigateTo('task-detail.html?id=${item.id}')">
                     <div class="todo-info">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="priority-tag priority-${item.priority}">${item.priority === 'high' ? '高' : (item.priority === 'med' ? '中' : '低')}</span>

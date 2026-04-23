@@ -39,6 +39,22 @@ const MockData = {
         { id: 4, type: "失访召回", patient: "张*兰", priority: "low", desc: "失访召回：第二次电话联系", time: "明天" },
         { id: 5, type: "首周期教育", patient: "曹*云", priority: "high", desc: "ADC 药物输注后教育", time: "剩余 2小时" },
         { id: 6, type: "标准随访", patient: "刘*财", priority: "med", desc: "D14 实验室检查检查单核对", time: "已逾期 1天" }
+    ],
+    // 患者列表数据
+    patients: [
+        { id: 101, name: "沈传浩", age: 52, status: "随访中", statusTag: "success", phone: "152****4701", enrollDate: "2024-03-15", disease: "NSCLC", cycle: "C3D1" },
+        { id: 102, name: "张英杰", age: 45, status: "待入组", statusTag: "warning", phone: "138****3344", enrollDate: "-", disease: "实体瘤", cycle: "-" },
+        { id: 103, name: "王丽华", age: 61, status: "已结项", statusTag: "muted", phone: "135****7766", enrollDate: "2024-02-10", disease: "尿路上皮癌", cycle: "Done" },
+        { id: 104, name: "曹静云", age: 48, status: "AE 回流", statusTag: "danger", phone: "173****0000", enrollDate: "2024-04-01", disease: "NSCLC", cycle: "C1D1" },
+        { id: 105, name: "刘建国", age: 55, status: "标准随访", statusTag: "info", phone: "139****2233", enrollDate: "2023-11-20", disease: "晚期胃癌", cycle: "C8D14" }
+    ],
+    // 患者全景时间轴
+    timeline: [
+        { date: '2024-03-01', title: '初诊入库', content: '门诊部初步诊断并转入项目组筛选。', type: 'milestone' },
+        { date: '2024-03-05', title: '签署知情同意书', content: '由专员陈美琳协助完成纸质签署并扫码入组。', type: 'check' },
+        { date: '2024-03-15', title: '正式入组', content: '符合入排标准，触发首次给药教育。', type: 'success' },
+        { date: '2024-04-10', title: '给药周期 1', content: '完成首轮 ADC 药物输注，进行出院前教育。', type: 'info' },
+        { id: 3, date: '2024-04-18', title: '发生 AE (皮疹)', content: '患者自述局部瘙痒，专员已提交异常回流。', type: 'danger' }
     ]
 };
 
@@ -108,6 +124,18 @@ const App = {
 
     getHelperArticle: function(id) {
         return MockData.helperEducation.find(a => a.id === id);
+    },
+
+    getPatients: function() {
+        return MockData.patients;
+    },
+
+    getPatientDetail: function(id) {
+        return MockData.patients.find(p => p.id == id);
+    },
+
+    getTimeline: function() {
+        return MockData.timeline;
     }
 };
 

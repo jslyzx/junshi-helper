@@ -73,9 +73,13 @@
             <span class="tab-icon">🏠</span>
             <span>首页</span>
         </a>
-        <a href="#" class="tab-item active">
+        <a href="task-list.html" class="tab-item active">
             <span class="tab-icon" style="position: relative;">📋 <span class="badge">14</span></span>
             <span>任务管理</span>
+        </a>
+        <a href="patient-list.html" class="tab-item">
+            <span class="tab-icon">👥</span>
+            <span>患者管理</span>
         </a>
         <a href="report-center.html" class="tab-item">
             <span class="tab-icon">📊</span>
@@ -108,7 +112,7 @@
             });
 
             list.innerHTML = filteredTasks.map(t => `
-                <div class="task-card animate-up" onclick="App.navigateTo('task-detail.html?id=' + ${t.id})">
+                <div class="task-card animate-up ${t.type === 'abnormal' ? 'is-abnormal' : ''}" onclick="App.navigateTo('task-detail.html?id=' + ${t.id})">
                     <div class="task-icon-circle ${t.color}">${t.icon}</div>
                     <div class="task-main">
                         <div class="task-header">

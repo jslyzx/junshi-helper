@@ -176,6 +176,38 @@ body {
 .priority-med { background: #FFF2E6; color: #E37318; }
 .priority-low { background: #EAF7F1; color: #2BA471; }
 
+/* 异常/警示状态全局标注 - 增强版 */
+.is-abnormal {
+    background: #FFF2F0 !important;
+    border: 1.5px solid #FFCCC7 !important;
+    box-shadow: 0 4px 15px rgba(213, 73, 65, 0.12) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.is-abnormal::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: #D54941;
+}
+
+/* 针对不同容器的微调 */
+.todo-item.is-abnormal {
+    margin: 8px -20px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border-bottom: none;
+}
+
+.patient-list-card.is-abnormal, .task-card.is-abnormal {
+    border-width: 1px;
+    border-style: solid;
+}
+
 .todo-info { flex: 1; }
 .todo-title { font-size: 14px; font-weight: 600; color: var(--text-main); }
 .todo-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }

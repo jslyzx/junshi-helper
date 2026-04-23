@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>患者详情 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .patient-hero {
+            background: var(--primary-gradient); color: white;
+            padding: 30px 20px; margin: -20px -20px 24px;
+            border-radius: 0 0 32px 32px; box-shadow: var(--shadow-lg);
+        }
+        .hero-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+        .hero-info h2 { font-size: 24px; margin-bottom: 4px; }
+        .hero-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .hero-tag { background: rgba(255,255,255,0.2); font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+        
+        .contact-bar {
+            display: flex; gap: 12px; margin-top: 20px;
+        }
+        .contact-item {
+            flex: 1; background: rgba(255,255,255,0.15); padding: 10px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px;
+        }
+
+        .panorama-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;
+        }
+        .panorama-item {
+            background: white; padding: 16px; border-radius: 20px;
+            border: 1px solid var(--glass-border); box-shadow: var(--shadow-sm);
+        }
+        .panorama-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .panorama-value { font-size: 15px; font-weight: 700; color: var(--text-main); }
+
+        /* 时间轴 */
+        .timeline-container { position: relative; padding-left: 32px; }
+        .timeline-container::before {
+            content: ''; position: absolute; left: 11px; top: 0; bottom: 0;
+            width: 2px; background: #E5E6EB;
+        }
+        .timeline-item { position: relative; margin-bottom: 30px; }
+        .timeline-dot {
+            position: absolute; left: -26px; top: 4px;
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #C9CDD4; border: 2px solid white; box-shadow: 0 0 0 3px #F2F3F5;
+            z-index: 2;
+        }
+        .timeline-item.active .timeline-dot {
+            background: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-soft);
+        }
+        .timeline-item.danger .timeline-dot {
+            background: var(--danger-color); box-shadow: 0 0 0 3px #FDEEEE;
+        }
+        .timeline-date { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+        .timeline-content {
+            background: white; padding: 16px; border-radius: 16px;
+            border: 1px solid #F0F2F5;
+        }
+        .timeline-title { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+        .timeline-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="header" style="background: transparent; border: none; color: white;">
+        <div class="back-btn" onclick="history.back()" style="background: rgba(255,255,255,0.2); color: white;">‹</div>
+        <h1 style="color: white;">临床全景</h1>
+        <div style="width: 32px;"></div>
+    </div>
+
+    <div class="container" style="margin-top: -64px; padding-top: 0;">
+        <div class="patient-hero animate-up">
+            <div class="hero-top">
+                <div class="hero-info">
+                    <h2 id="pName">---</h2>
+                    <div class="hero-tags">
+                        <span class="hero-tag" id="pGenderAge">--岁</span>
+                        <span class="hero-tag" id="pDisease">---</span>
+                    </div>
+                </div>
+                <div class="status-badge" id="pStatus" style="background: white;">---</div>
+            </div>
+            <div style="font-size: 13px; opacity: 0.9;">入组日期：<span id="pEnrollDate">----</span></div>
+            <div class="contact-bar">
+                <div class="contact-item">📞 拨打电话</div>
+                <div class="contact-item">💬 发送提醒</div>
+            </div>
+        </div>
+
+        <div class="panorama-grid animate-up" style="animation-delay: 0.1s;">
+            <div class="panorama-item">
+                <div class="panorama-label">当前周期</div>
+                <div class="panorama-value" id="pCycle">---</div>
+            </div>
+            <div class="panorama-item">
+                <div class="panorama-label">治疗方案</div>
+                <div class="panorama-value">ADC 联合免疫</div>
+            </div>
+            <div class="panorama-item">
+                <div class="panorama-label">AE 记录</div>
+                <div class="panorama-value" style="color: var(--danger-color);">1 次 (2 级)</div>
+            </div>
+            <div class="panorama-item">
+                <div class="panorama-label">最近访视</div>
+                <div class="panorama-value">2024-04-10</div>
+            </div>
+        </div>
+
+        <div class="section-title animate-up" style="animation-delay: 0.2s;">
+            诊疗时间轴
+        </div>
+
+        <div class="timeline-container animate-up" style="animation-delay: 0.3s;" id="timelineList">
+            <!-- 由 JS 渲染 -->
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        function renderDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            const p = App.getPatientDetail(id);
+            
+            if (!p) {
+                alert('患者不存在');
+                history.back();
+                return;
+            }
+
+            document.getElementById('pName').innerText = p.name;
+            document.getElementById('pGenderAge').innerText = p.age + ' 岁';
+            document.getElementById('pDisease').innerText = p.disease;
+            document.getElementById('pStatus').innerText = p.status;
+            document.getElementById('pEnrollDate').innerText = p.enrollDate;
+            document.getElementById('pCycle').innerText = p.cycle;
+
+            const timeline = App.getTimeline();
+            const container = document.getElementById('timelineList');
+            container.innerHTML = timeline.map((item, index) => `
+                <div class="timeline-item ${index === 0 ? 'active' : ''} ${item.type === 'danger' ? 'danger' : ''}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">${item.date}</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">${item.title}</div>
+                        <div class="timeline-desc">${item.content}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDetail);
+    </script>
+</body>
+</html>
