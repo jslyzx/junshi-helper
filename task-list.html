@@ -121,7 +121,7 @@
                         </div>
                         <div class="task-meta">${t.desc}</div>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span class="status-tag status-active" style="font-size:10px">待处理</span>
+                            <span class="status-tag status-active" style="font-size:10px">${t.type === 'abnormal' ? '待上报' : '待处理'}</span>
                             <span style="font-size:11px; color:var(--text-muted)">更新于 10分钟前</span>
                         </div>
                     </div>
