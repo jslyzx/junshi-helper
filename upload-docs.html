@@ -356,6 +356,10 @@
             if (!name || !idCard || !disease) { alert('请确保姓名、身份证号和确诊疾病已填写'); return; }
             if (!phone || !/^1\d{10}$/.test(phone)) { alert('请输入正确的手机号码'); return; }
             if (consentPages.length === 0) { alert('请上传知情同意书（至少 1 页）'); return; }
+
+            // 模拟保存逻辑，包含多页数组
+            console.log("Saving patient with consentPages:", consentPages);
+            
             alert('建档成功！患者资料已提交审核');
             history.back();
         }
