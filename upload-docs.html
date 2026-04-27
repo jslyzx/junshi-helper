@@ -179,12 +179,19 @@
         <div id="uploadSection">
             <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 1px;">上传材料</div>
             <div class="doc-grid">
-                <div class="doc-upload-card" id="card-idcard" onclick="triggerUpload('idcard')">
+                <div class="doc-upload-card" id="card-idcard-front" onclick="triggerUpload('idcard-front')">
                     <div class="doc-icon" style="background: #EAF7F1;">🪪</div>
                     <div class="doc-name">身份证正面</div>
-                    <div class="doc-hint">必传 · 拍照上传</div>
+                    <div class="doc-hint">选传 · 拍照上传</div>
                     <div class="doc-check">✓</div>
-                    <img class="doc-thumb" id="thumb-idcard" onclick="event.stopPropagation(); openViewer(this.src)">
+                    <img class="doc-thumb" id="thumb-idcard-front" onclick="event.stopPropagation(); openViewer(this.src)">
+                </div>
+                <div class="doc-upload-card" id="card-idcard-back" onclick="triggerUpload('idcard-back')">
+                    <div class="doc-icon" style="background: #EAF7F1;">🪪</div>
+                    <div class="doc-name">身份证反面</div>
+                    <div class="doc-hint">选传 · 拍照上传</div>
+                    <div class="doc-check">✓</div>
+                    <img class="doc-thumb" id="thumb-idcard-back" onclick="event.stopPropagation(); openViewer(this.src)">
                 </div>
                 <div class="doc-upload-card" id="card-diagnosis" onclick="triggerUpload('diagnosis')">
                     <div class="doc-icon" style="background: #FFF2E6;">📋</div>
@@ -200,7 +207,7 @@
                     <div class="doc-check">✓</div>
                     <img class="doc-thumb" id="thumb-prescription" onclick="event.stopPropagation(); openViewer(this.src)">
                 </div>
-                <div class="doc-upload-card" id="card-consent" onclick="triggerConsentUpload()">
+                <div class="doc-upload-card" id="card-consent" onclick="triggerConsentUpload()" style="grid-column: span 2;">
                     <div class="doc-icon" style="background: #F3E8FF;">🖋️</div>
                     <div class="doc-name">知情同意书</div>
                     <div class="doc-hint" id="consent-hint">必传 · 支持多页</div>
@@ -308,9 +315,9 @@
 
         function simulateOCR(type) {
             const results = {
-                idcard: { name: '林建国', idCard: '310115199203151234', gender: '男', birthDate: '1992-03-15' },
-                diagnosis: { disease: '非小细胞肺癌 (NSCLC)', stage: 'III期', hospital: '上海交通大学附属瑞金医院' },
-                prescription: { medication: 'PD-1 单抗 + 顺铂', dosage: '200mg Q3W' },
+                'idcard-front': { name: '林建国', idCard: '310115199203151234', gender: '男', birthDate: '1992-03-15' },
+                diagnosis: { disease: '非小细胞肺癌', stage: 'III期', hospital: '上海交通大学附属瑞金医院' },
+                prescription: { medication: 'PD-1 单抗', dosage: '' },
                 consent: { signDate: new Date().toISOString().split('T')[0], status: '已签署' }
             };
             return results[type] || {};
@@ -402,10 +409,9 @@
 
         function handleSubmit() {
             const name = document.getElementById('r-name').value;
-            const idCard = document.getElementById('r-idcard').value;
             const disease = document.getElementById('r-disease').value;
             const phone = document.getElementById('r-phone').value;
-            if (!name || !idCard || !disease) { alert('请确保姓名、身份证号和确诊疾病已填写'); return; }
+            if (!name || !disease) { alert('请确保姓名和确诊疾病已填写'); return; }
             if (!phone || !/^1\d{10}$/.test(phone)) { alert('请输入正确的手机号码'); return; }
             if (consentPages.length === 0) { alert('请上传知情同意书（至少 1 页）'); return; }
 

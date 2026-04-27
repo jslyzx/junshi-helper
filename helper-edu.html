@@ -46,6 +46,8 @@
         .cat-tag {
             font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
         }
+        .cat-岗位职责 { background: #EBF5FF; color: #0052D9; }
+        .cat-SOP\ 培训 { background: #F3F2FD; color: #7367F0; }
         .cat-疾病基础 { background: #EBF5FF; color: #0052D9; }
         .cat-产品知识 { background: #EAF7F1; color: #2BA471; }
         .cat-合规要求 { background: #FFF2E6; color: #E37318; }
@@ -69,6 +71,8 @@
         <!-- 分类筛选 -->
         <div class="filter-bar animate-up">
             <div class="filter-chip active" onclick="filterBy('全部')">全部</div>
+            <div class="filter-chip" onclick="filterBy('岗位职责')">📋 岗位职责</div>
+            <div class="filter-chip" onclick="filterBy('SOP 培训')">📐 SOP 培训</div>
             <div class="filter-chip" onclick="filterBy('疾病基础')">🧬 疾病基础</div>
             <div class="filter-chip" onclick="filterBy('产品知识')">💊 产品知识</div>
             <div class="filter-chip" onclick="filterBy('合规要求')">📜 合规要求</div>
@@ -84,10 +88,12 @@
     <script src="js/app.js"></script>
     <script>
         const categoryIcons = {
-            '疾病基础': '🧬', '产品知识': '💊', '合规要求': '📜',
+            '岗位职责': '📋', 'SOP 培训': '📐', '疾病基础': '🧬', '产品知识': '💊', '合规要求': '📜',
             'AE/PV流程': '🚨', '沟通技巧': '💬', '系统操作': '🖥️'
         };
         const categoryBg = {
+            '岗位职责': 'linear-gradient(135deg, #EBF5FF 0%, #D6E8FF 100%)',
+            'SOP 培训': 'linear-gradient(135deg, #F3F2FD 0%, #E8E6FC 100%)',
             '疾病基础': 'linear-gradient(135deg, #EBF5FF 0%, #D6E8FF 100%)',
             '产品知识': 'linear-gradient(135deg, #EAF7F1 0%, #D4F0E4 100%)',
             '合规要求': 'linear-gradient(135deg, #FFF7ED 0%, #FFECD2 100%)',

@@ -143,8 +143,14 @@ const App = {
 
 // 专员端教育内容数据
 MockData.helperEducation = [
+    // 岗位职责
+    { id: 1, category: '岗位职责', title: '临床项目专员 (Helper) 岗位职责说明书', summary: '明确 Helper 在项目中的核心定位、职责范围及日常工作汇报线。', readCount: 1250, date: '2024-04-25' },
+    { id: 2, category: '岗位职责', title: '项目专员月度考核指标 (KPI) 详解', summary: '深度解析入组率、随访及时率及数据准确性等关键考核维度的计算方法。', readCount: 980, date: '2024-04-20' },
+    // SOP 培训
+    { id: 3, category: 'SOP 培训', title: '现场入组 SOP：从扫码到签字的标准流程', summary: '规范现场入组的每一步操作，确保知情同意书签署的合规性与资料上传的完整性。', readCount: 1560, date: '2024-04-22' },
+    { id: 4, category: 'SOP 培训', title: '异常回流处理 SOP：AE 事件的识别与归档', summary: '当系统触发异常回流时，专员应如何协助医生补充临床证据并完成数据上报。', readCount: 1120, date: '2024-04-18' },
     // 疾病基础知识
-    { id: 101, category: '疾病基础', title: '非小细胞肺癌 (NSCLC) 概览与分期', summary: '了解 NSCLC 的病理分型、TNM 分期标准及治疗策略选择依据。', readCount: 2340, date: '2024-04-10' },
+    { id: 101, category: '疾病基础', title: '非小细胞肺癌概览与分期', summary: '了解非小细胞肺癌的病理分型、TNM 分期标准及治疗策略选择依据。', readCount: 2340, date: '2024-04-10' },
     { id: 102, category: '疾病基础', title: '尿路上皮癌的诊断与治疗进展', summary: '掌握尿路上皮癌的流行病学、诊断指标及一线/二线治疗方案。', readCount: 1820, date: '2024-04-05' },
     // 产品知识
     { id: 201, category: '产品知识', title: 'ADC 药物作用机制及适应症全景', summary: '靶向 ADC 如何实现"生物导弹"精准打击，覆盖已获批适应症详解。', readCount: 4100, date: '2024-04-12' },
