@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>服务评价 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .rating-summary {
+            background: white; border-radius: 20px; padding: 24px; text-align: center;
+            margin-bottom: 20px; border: 1px solid #F0F2F5;
+        }
+        .big-score { font-size: 48px; font-weight: 800; color: #FF9500; line-height: 1; margin-bottom: 8px; }
+        .stars { color: #FF9500; font-size: 18px; margin-bottom: 12px; }
+        
+        .eval-item {
+            background: white; border-radius: 16px; padding: 20px; margin-bottom: 12px;
+            border: 1px solid #F0F2F5;
+        }
+        .eval-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .eval-user { font-weight: 600; color: var(--text-main); }
+        .eval-date { font-size: 12px; color: var(--text-muted); }
+        .eval-stars { color: #FF9500; font-size: 14px; margin-bottom: 10px; }
+        .eval-content { font-size: 14px; color: var(--text-secondary); line-height: 1.6; background: #F9FAFB; padding: 12px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="back-btn" onclick="history.back()">✕</div>
+        <h1>服务评价记录</h1>
+    </div>
+
+    <div class="container">
+        <div class="rating-summary animate-up">
+            <div class="big-score">4.9</div>
+            <div class="stars">★★★★★</div>
+            <div style="font-size: 13px; color: var(--text-muted);">患者好评率 98%</div>
+        </div>
+
+        <div id="evalList">
+            <!-- 模拟数据 -->
+            <div class="eval-item animate-up" style="animation-delay: 0.1s;">
+                <div class="eval-header">
+                    <span class="eval-user">吴*珍</span>
+                    <span class="eval-date">2026-04-26 14:20</span>
+                </div>
+                <div class="eval-stars">★★★★★ <span style="color:var(--text-muted); font-size:12px; margin-left:8px;">5.0</span></div>
+                <div class="eval-content">专员非常耐心，每次咨询都能得到详细的解答，对我的康复非常有帮助，非常感谢。</div>
+            </div>
+
+            <div class="eval-item animate-up" style="animation-delay: 0.15s;">
+                <div class="eval-header">
+                    <span class="eval-user">张*</span>
+                    <span class="eval-date">2026-04-25 10:15</span>
+                </div>
+                <div class="eval-stars">★★★★☆ <span style="color:var(--text-muted); font-size:12px; margin-left:8px;">4.0</span></div>
+                <div class="eval-content">服务态度很好，随访比较专业。如果能更早一点打电话沟通就更好了。</div>
+            </div>
+
+            <div class="eval-item animate-up" style="animation-delay: 0.2s;">
+                <div class="eval-header">
+                    <span class="eval-user">齐*</span>
+                    <span class="eval-date">2026-04-20 16:30</span>
+                </div>
+                <div class="eval-stars">★★★★★ <span style="color:var(--text-muted); font-size:12px; margin-left:8px;">5.0</span></div>
+                <div class="eval-content">非常专业，流程清晰，随访中心的人员也非常客气。</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
