@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>补充材料 - 项目专员端</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .form-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+        .form-label { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: block; }
+        
+        .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .upload-btn {
+            aspect-ratio: 1; border-radius: 12px; border: 2px dashed #E5E6EB;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+        }
+        .upload-btn:active { background: var(--primary-soft); border-color: var(--primary-color); }
+        
+        .photo-item { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; }
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-del {
+            position: absolute; top: 4px; right: 4px; width: 20px; height: 20px;
+            background: rgba(0,0,0,0.5); color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 12px;
+        }
+
+        textarea {
+            width: 100%; border: 1px solid #E5E6EB; border-radius: 12px; padding: 12px;
+            font-size: 14px; outline: none; transition: border-color 0.2s; resize: none;
+        }
+        textarea:focus { border-color: var(--primary-color); }
+        
+        .submit-bar { margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="back-btn" onclick="history.back()">‹</div>
+        <h1>补充材料</h1>
+        <div style="width: 32px;"></div>
+    </div>
+
+    <div class="container animate-up">
+        <div class="form-card">
+            <span class="form-label">上传材料图片</span>
+            <div class="upload-grid" id="photoGrid">
+                <div class="upload-btn" onclick="triggerUpload()">
+                    <span style="font-size: 24px;">+</span>
+                    <span style="font-size: 11px; margin-top: 4px;">拍照/相册</span>
+                </div>
+            </div>
+            <input type="file" id="fileInput" hidden accept="image/*" multiple>
+
+            <span class="form-label">材料说明/备注</span>
+            <textarea id="remark" rows="4" placeholder="请输入材料相关说明，如：D14 门诊检查单、患者出院小结等..."></textarea>
+        </div>
+
+        <div class="submit-bar">
+            <button class="todo-action" style="width: 100%; height: 50px; font-size: 16px;" onclick="submitForm()">确认提交</button>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const photos = [];
+        const urlParams = new URLSearchParams(window.location.search);
+        const patientId = urlParams.get('id');
+
+        function triggerUpload() {
+            document.getElementById('fileInput').click();
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    photos.push(event.target.result);
+                    renderPhotos();
+                };
+                reader.readAsDataURL(file);
+            });
+            this.value = '';
+        });
+
+        function renderPhotos() {
+            const grid = document.getElementById('photoGrid');
+            const items = photos.map((src, idx) => `
+                <div class="photo-item">
+                    <img src="${src}">
+                    <div class="photo-del" onclick="removePhoto(${idx})">✕</div>
+                </div>
+            `).join('');
+            grid.innerHTML = items + `
+                <div class="upload-btn" onclick="triggerUpload()">
+                    <span style="font-size: 24px;">+</span>
+                    <span style="font-size: 11px; margin-top: 4px;">拍照/相册</span>
+                </div>
+            `;
+        }
+
+        function removePhoto(idx) {
+            photos.splice(idx, 1);
+            renderPhotos();
+        }
+
+        function submitForm() {
+            const remark = document.getElementById('remark').value.trim();
+            if (photos.length === 0) {
+                alert('请至少上传一张图片');
+                return;
+            }
+            if (!remark) {
+                alert('请填写材料说明');
+                return;
+            }
+
+            const supplement = {
+                date: new Date().toISOString().split('T')[0],
+                title: '专员补充材料',
+                content: remark,
+                photos: photos
+            };
+
+            App.saveSupplement(patientId, supplement);
+            alert('提交成功！医生端已同步可见。');
+            history.back();
+        }
+    </script>
+</body>
+</html>

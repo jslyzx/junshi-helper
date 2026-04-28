@@ -56,7 +56,11 @@ const MockData = {
         { date: '2024-03-05', title: '签署知情同意书', content: '由专员陈美琳协助完成纸质签署并扫码入组。', type: 'check' },
         { date: '2024-03-15', title: '正式入组', content: '符合入排标准，触发首次给药教育。', type: 'success' },
         { date: '2024-04-10', title: '给药周期 1', content: '完成首轮 ADC 药物输注，进行出院前教育。', type: 'info' },
-        { id: 3, date: '2024-04-18', title: '发生 AE (皮疹)', content: '患者自述局部瘙痒，专员已提交异常回流。', type: 'danger' }
+        { id: 3, date: '2024-04-18', title: '发生 AE (皮疹)', content: '患者自述局部瘙痒，专员已提交异常回流处理。', type: 'danger' }
+    ],
+    // 补充材料
+    supplements: [
+        { id: 1, patientId: 101, date: '2024-04-20', title: '补充材料: 门诊病历', content: '专员协助上传的门诊复查记录。', photos: ['https://picsum.photos/id/40/400/600'], type: 'info' }
     ]
 };
 
@@ -136,8 +140,41 @@ const App = {
         return MockData.patients.find(p => p.id == id);
     },
 
-    getTimeline: function() {
-        return MockData.timeline;
+    getTimeline: function(patientId) {
+        let baseTimeline = [...MockData.timeline];
+        const supplements = this.getSupplements(patientId);
+        
+        // 将补充材料转换为时间轴格式并合并
+        supplements.forEach(s => {
+            baseTimeline.push({
+                id: 'sup_' + s.id,
+                date: s.date,
+                title: s.title,
+                content: s.content,
+                photos: s.photos,
+                type: 'info',
+                isSupplement: true
+            });
+        });
+
+        // 按日期排序
+        return baseTimeline.sort((a, b) => new Date(b.date) - new Date(a.date));
+    },
+
+    getSupplements: function(patientId) {
+        const localData = localStorage.getItem('patient_supplements_' + patientId);
+        const saved = localData ? JSON.parse(localData) : [];
+        const mock = MockData.supplements.filter(s => s.patientId == patientId);
+        return [...mock, ...saved];
+    },
+
+    saveSupplement: function(patientId, supplement) {
+        const localData = localStorage.getItem('patient_supplements_' + patientId);
+        const saved = localData ? JSON.parse(localData) : [];
+        supplement.id = Date.now();
+        saved.push(supplement);
+        localStorage.setItem('patient_supplements_' + patientId, JSON.stringify(saved));
+        return supplement;
     }
 };
 

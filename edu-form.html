@@ -43,6 +43,25 @@
         .btn-flex:active { transform: scale(0.96); opacity: 0.9; }
         .btn-outline { background: #F2F3F5; color: var(--text-secondary); }
         .btn-primary { background: linear-gradient(135deg, #0052D9 0%, #003EB3 100%); color: white; box-shadow: 0 12px 32px rgba(0, 82, 217, 0.2); }
+
+        /* 图片上传样式 */
+        .upload-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px;
+        }
+        .upload-item {
+            aspect-ratio: 1; border-radius: 12px; border: 1.5px dashed #E5E6EB;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+            background: #FAFBFC;
+        }
+        .upload-item:active { background: #F2F3F5; transform: scale(0.98); }
+        .upload-item.has-img { border-style: solid; border-color: var(--info-color); }
+        .upload-item img { width: 100%; height: 100%; object-fit: cover; }
+        .upload-item .del-btn {
+            position: absolute; top: 4px; right: 4px; width: 18px; height: 18px;
+            background: rgba(0,0,0,0.5); color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 10px; z-index: 5;
+        }
     </style>
 </head>
 <body>
@@ -116,6 +135,18 @@
                         </div>
                     </label>
                 </div>
+            </div>
+
+            <div class="section-title">留存工作记录</div>
+            <div class="card">
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">上传宣教现场照片，留存服务记录：</p>
+                <div class="upload-grid" id="workImages">
+                    <div class="upload-item" onclick="triggerWorkUpload()">
+                        <span style="font-size: 24px; color: #999;">+</span>
+                        <span style="font-size: 10px; color: #999; margin-top: 4px;">上传图片</span>
+                    </div>
+                </div>
+                <input type="file" id="workFileInput" hidden accept="image/*" capture="environment" multiple>
             </div>
         </div>
 
@@ -207,6 +238,53 @@
         function updateBtns() {
             document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
             document.getElementById('nextBtn').innerText = currentStep === 3 ? '确认完成教导' : '下一步';
+        }
+
+        // 工作图片上传逻辑
+        const workImages = [];
+        const workFileInput = document.getElementById('workFileInput');
+        
+        function triggerWorkUpload() {
+            workFileInput.click();
+        }
+
+        workFileInput.addEventListener('change', function() {
+            if (!this.files.length) return;
+            
+            Array.from(this.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    workImages.push(e.target.result);
+                    renderWorkImages();
+                };
+                reader.readAsDataURL(file);
+            });
+            this.value = '';
+        });
+
+        function renderWorkImages() {
+            const container = document.getElementById('workImages');
+            let html = workImages.map((src, i) => `
+                <div class="upload-item has-img">
+                    <img src="${src}">
+                    <div class="del-btn" onclick="removeWorkImg(${i})">✕</div>
+                </div>
+            `).join('');
+            
+            if (workImages.length < 6) {
+                html += `
+                    <div class="upload-item" onclick="triggerWorkUpload()">
+                        <span style="font-size: 24px; color: #999;">+</span>
+                        <span style="font-size: 10px; color: #999; margin-top: 4px;">上传图片</span>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function removeWorkImg(index) {
+            workImages.splice(index, 1);
+            renderWorkImages();
         }
     </script>
 </body>

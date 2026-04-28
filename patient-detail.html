@@ -60,6 +60,24 @@
         }
         .timeline-title { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
         .timeline-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .timeline-photos { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; padding-bottom: 4px; }
+        .timeline-photo { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 1px solid #F0F2F5; }
+        
+        /* 预览模态框 */
+        .viewer-modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        .viewer-modal.active { display: flex; animation: fadeIn 0.3s ease; }
+        .viewer-img { max-width: 95%; max-height: 85%; object-fit: contain; border-radius: 8px; }
+        .viewer-close {
+            position: absolute; top: 40px; right: 25px; width: 44px; height: 44px;
+            background: rgba(255,255,255,0.2); color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 2010;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -84,8 +102,8 @@
             <div style="font-size: 13px; opacity: 0.9;">入组日期：<span id="pEnrollDate">----</span></div>
             <div class="contact-bar">
                 <div class="contact-item" onclick="App.navigateTo('upload-docs.html')">📋 协助上传</div>
-                <div class="contact-item">📞 拨打电话</div>
-                <div class="contact-item">💬 发送提醒</div>
+                <div class="contact-item" id="btnSupplement">➕ 补充材料</div>
+                <div class="contact-item">💬 提醒</div>
             </div>
         </div>
 
@@ -117,6 +135,12 @@
         </div>
     </div>
 
+    <!-- 图片预览模态框 -->
+    <div id="imageViewer" class="viewer-modal" onclick="closeViewer()">
+        <div class="viewer-close">✕</div>
+        <img id="viewerImg" class="viewer-img">
+    </div>
+
     <script src="js/app.js"></script>
     <script>
         function renderDetail() {
@@ -136,8 +160,9 @@
             document.getElementById('pStatus').innerText = p.status;
             document.getElementById('pEnrollDate').innerText = p.enrollDate;
             document.getElementById('pCycle').innerText = p.cycle;
+            document.getElementById('btnSupplement').onclick = () => App.navigateTo(`supplement-form.html?id=${id}`);
 
-            const timeline = App.getTimeline();
+            const timeline = App.getTimeline(id);
             const container = document.getElementById('timelineList');
             container.innerHTML = timeline.map((item, index) => `
                 <div class="timeline-item ${index === 0 ? 'active' : ''} ${item.type === 'danger' ? 'danger' : ''}">
@@ -146,12 +171,26 @@
                     <div class="timeline-content ${item.type === 'danger' ? 'is-abnormal' : ''}">
                         <div class="timeline-title">${item.title}</div>
                         <div class="timeline-desc">${item.content}</div>
+                        ${item.photos ? `
+                            <div class="timeline-photos">
+                                ${item.photos.map(p => `<img src="${p}" class="timeline-photo" onclick="event.stopPropagation(); openViewer('${p}')">`).join('')}
+                            </div>
+                        ` : ''}
                         ${item.type === 'danger' ? `
                             <button class="todo-action" style="margin-top: 12px; border: none; width: 100px; padding: 8px;" onclick="alert('已发起异常上报，请等待医生确认')">上报医生</button>
                         ` : ''}
                     </div>
                 </div>
             `).join('');
+        }
+
+        function openViewer(src) {
+            document.getElementById('viewerImg').src = src;
+            document.getElementById('imageViewer').classList.add('active');
+        }
+
+        function closeViewer() {
+            document.getElementById('imageViewer').classList.remove('active');
         }
 
         document.addEventListener('DOMContentLoaded', renderDetail);
