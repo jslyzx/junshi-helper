@@ -13,6 +13,7 @@ const MockData = {
     messages: [
         { id: 100, type: "bind", unread: true, title: "新患者绑定通知", desc: "患者【林*国】已扫码绑定，请关注其资料提交进度，如有需要可协助上传。", time: "5 分钟前", icon: "👤", color: "bg-green" },
         { id: 101, type: "announcement", unread: true, title: "项目补丁说明 V2.4", desc: "请各位专员务必于本周五前完成 D10 随访数据的二次质控核对。", time: "10 分钟前", icon: "📢", color: "bg-blue" },
+        { id: 105, type: "complaint", unread: true, title: "新投诉提醒", desc: "患者【李*强】提交了一项针对您的投诉，请及时查看并跟进处理。", time: "30 分钟前", icon: "📢", color: "bg-rose" },
         { id: 102, type: "alert", unread: true, title: "随访即将逾期预警", desc: "患者【曹*云】的 D1 访视教育任务还有 2 小时截止，请尽快处理。", time: "1 小时前", icon: "⏰", color: "bg-rose" },
         { id: 103, type: "qc", unread: false, title: "数据质控已通过", desc: "您提交的患者【张*华】现场入组申请已通过审核，现已进入随访期。", time: "昨天 14:20", icon: "✅", color: "bg-green" },
         { id: 104, type: "system", unread: false, title: "系统停机维护公告", desc: "系统将于本周日凌晨 02:00-04:00 进行例行维护，届时将无法登录。", time: "2024-04-18", icon: "⚙️", color: "bg-purple" }
@@ -61,6 +62,11 @@ const MockData = {
     // 补充材料
     supplements: [
         { id: 1, patientId: 101, date: '2024-04-20', title: '补充材料: 门诊病历', content: '专员协助上传的门诊复查记录。', photos: ['https://picsum.photos/id/40/400/600'], type: 'info' }
+    ],
+    // 投诉记录
+    complaints: [
+        { id: 1, time: '2024-04-30 14:10', patient: '李*强', target: '项目专员', content: '回复消息比较慢，希望可以改进。', status: '处理中' },
+        { id: 2, time: '2024-04-25 09:30', patient: '王*平', target: '项目专员', content: '服务态度可以再热情一点。', status: '已关闭' }
     ]
 };
 
@@ -83,6 +89,10 @@ const App = {
 
     getMessages: function() {
         return MockData.messages;
+    },
+
+    getComplaints: function() {
+        return MockData.complaints;
     },
 
     getUnreadCount: function() {

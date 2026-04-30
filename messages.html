@@ -115,6 +115,8 @@
                     setTimeout(() => alert(`即将跳转至任务处理：${msg.title}`), 100);
                 } else if (msg.type === 'qc') {
                     setTimeout(() => location.href = 'report-center.html', 100);
+                } else if (msg.type === 'complaint') {
+                    setTimeout(() => location.href = 'complaint-list.html', 100);
                 }
             }
         }
