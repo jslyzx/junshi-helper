@@ -71,37 +71,30 @@
     </div>
 
     <div class="container" style="padding-bottom: 120px;">
-        <div class="step-indicator">
-            <div class="step-dot active">1</div>
-            <div class="step-dot">2</div>
-            <div class="step-dot">3</div>
-        </div>
-
-        <!-- 步骤 1: 准备工作 -->
+        <!-- 教育对象信息保留为后台任务上下文，页面不再展示分步流程 -->
         <div id="step1" class="animate-up">
             <div class="section-title">教育对象</div>
             <div class="card">
                 <div class="form-group">
                     <label class="form-label">选择待教育患者</label>
-                    <select class="form-input">
+                    <select class="form-input" id="patientSelect">
                         <option value="">请选择患者...</option>
-                        <option value="1" selected>曹*云 (首周期药物输注前)</option>
+                        <option value="1">曹*云 (首周期药物输注前)</option>
                         <option value="2">王*建 (初次入组后)</option>
                     </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label">本次宣教媒介使用</label>
-                    <div style="display: flex; gap: 12px;">
-                        <button class="btn-flex btn-outline" style="background: #EBF5FF; border-color: #0052D9; color: #0052D9;">小程序视频</button>
-                        <button class="btn-flex btn-outline">纸质手册</button>
-                        <button class="btn-flex btn-outline">仅口头宣导</button>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 步骤 2: 核心宣教内容核查 -->
-        <div id="step2" class="hidden">
+        <!-- 核心宣教内容核查 -->
+        <div id="taskPatientCard" class="card hidden" style="border-color: rgba(0,82,217,.18); background: linear-gradient(135deg, #EBF5FF 0%, #FFFFFF 100%);">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                <div style="font-size: 18px; font-weight: 800; color: var(--text-main);" id="taskPatientName">曹*云</div>
+                <div style="font-size: 12px; font-weight: 700; color: var(--info-color); background: #EBF5FF; padding: 6px 10px; border-radius: 999px;">首周期教育任务</div>
+            </div>
+        </div>
+
+        <div id="step2" class="animate-up">
             <div class="section-title">内容核点 (Checklist)</div>
             <div class="card">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">请向患者及家属逐一讲解以下要点，完成一项勾选一项：</p>
@@ -179,12 +172,45 @@
     </div>
 
     <div class="btn-group">
-        <button class="btn-flex btn-outline" id="prevBtn" onclick="prevStep()" style="display: none;">上一步</button>
-        <button class="btn-flex btn-primary" id="nextBtn" onclick="nextStep()">下一步</button>
+        <button class="btn-flex btn-primary" id="nextBtn" onclick="submitEducation()">确认完成宣教</button>
     </div>
 
     <script>
-        let currentStep = 1;
+        let currentStep = 2;
+        const eduParams = new URLSearchParams(window.location.search);
+        const isTaskMode = eduParams.has('taskId');
+
+        function initEducationPage() {
+            const patientSelectBlock = document.getElementById('step1');
+            const taskPatientCard = document.getElementById('taskPatientCard');
+            const taskPatientName = document.getElementById('taskPatientName');
+            const patientSelect = document.getElementById('patientSelect');
+            const patientFromTask = eduParams.get('patient') || '曹*云';
+
+            if (isTaskMode) {
+                patientSelectBlock.classList.add('hidden');
+                patientSelectBlock.classList.remove('animate-up');
+                taskPatientName.innerText = patientFromTask;
+                taskPatientCard.classList.remove('hidden');
+                if (patientSelect) patientSelect.value = '1';
+            } else {
+                patientSelectBlock.classList.remove('hidden');
+                patientSelectBlock.classList.add('animate-up');
+                taskPatientCard.classList.add('hidden');
+                if (patientSelect) patientSelect.value = '';
+            }
+        }
+
+        function submitEducation() {
+            const patientSelect = document.getElementById('patientSelect');
+            if (!isTaskMode && patientSelect && !patientSelect.value) {
+                alert('请先选择需要进行首周期教育的患者');
+                patientSelect.focus();
+                return;
+            }
+            alert('首周期教育记录已完成登记！');
+            window.location.href = 'index.html';
+        }
 
         function nextStep() {
             if (currentStep < 3) {
@@ -286,6 +312,8 @@
             workImages.splice(index, 1);
             renderWorkImages();
         }
+
+        document.addEventListener('DOMContentLoaded', initEducationPage);
     </script>
 </body>
 </html>

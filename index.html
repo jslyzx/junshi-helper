@@ -275,9 +275,9 @@
                 <div class="action-icon bg-orange">📷</div>
                 <div class="action-label">专属二维码</div>
             </div>
-            <div class="action-btn" onclick="App.navigateTo('enroll-form.html')">
-                <div class="action-icon bg-green">✨</div>
-                <div class="action-label">现场入组</div>
+            <div class="action-btn" onclick="App.navigateTo('followup-form.html')">
+                <div class="action-icon bg-green">📝</div>
+                <div class="action-label">现场补访</div>
             </div>
             <div class="action-btn" onclick="App.navigateTo('edu-form.html')">
                 <div class="action-icon bg-blue">📚</div>
@@ -409,7 +409,15 @@
             const list = document.getElementById('todoList');
             list.innerHTML = todos.map(item => {
                 const isUploadTask = item.type === '材料待上传';
-                const clickAction = isUploadTask ? `App.navigateTo('upload-docs.html?id=${item.id}')` : `App.navigateTo('task-detail.html?id=${item.id}')`;
+                const isEducationTask = item.type === '首周期教育';
+                const isFollowupTask = item.type === '现场补访';
+                const clickAction = isUploadTask
+                    ? `App.navigateTo('upload-docs.html?id=${item.id}')`
+                    : (isEducationTask
+                        ? `App.navigateTo('edu-form.html?taskId=${item.id}&patient=${encodeURIComponent(item.patient)}')`
+                        : (isFollowupTask
+                            ? `App.navigateTo('followup-form.html?taskId=${item.id}&patient=${encodeURIComponent(item.patient)}')`
+                            : `App.navigateTo('task-detail.html?id=${item.id}')`));
 
                 return `
                 <div class="todo-item ${item.type === '异常回流' ? 'is-abnormal' : ''}" onclick="${clickAction}">

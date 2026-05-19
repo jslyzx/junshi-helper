@@ -1,266 +1,510 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>现场补访记录 - 项目专员端</title>
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        .step-indicator {
-            display: flex; justify-content: space-between; margin-bottom: 30px; position: relative;
-        }
-        .step-indicator::before {
-            content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 2px;
-            background: #E5E6EB; z-index: 1;
-        }
-        .step-dot {
-            width: 32px; height: 32px; border-radius: 50%; background: white; border: 2px solid #E5E6EB;
-            display: flex; align-items: center; justify-content: center; z-index: 2; font-size: 12px; font-weight: 700; color: var(--text-muted);
-            transition: all 0.3s;
-        }
-        .step-dot.active { background: var(--primary-color); border-color: var(--primary-color); color: white; }
-        .step-dot.completed { background: var(--primary-light); border-color: var(--primary-color); color: var(--primary-color); }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>现场补访记录 - 项目专员端</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .page-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .top-card {
+      background: linear-gradient(135deg, #EAF7F1 0%, #FFFFFF 100%);
+      border: 1px solid rgba(43, 164, 113, 0.18);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-md);
+    }
+    .patient-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .patient-main { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--primary-gradient); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 18px;
+      box-shadow: 0 10px 24px rgba(43,164,113,.22);
+    }
+    .patient-name { font-size: 18px; font-weight: 800; color: var(--text-main); }
+    .patient-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 6px 10px; border-radius: 999px;
+      background: rgba(43, 164, 113, .1); color: var(--primary-color);
+      font-size: 12px; font-weight: 700; white-space: nowrap;
+    }
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
 
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
-        .form-input {
-            width: 100%; height: 48px; border-radius: 12px; border: 1px solid #E5E6EB; padding: 0 16px;
-            font-size: 15px; font-family: inherit; transition: border-color 0.2s; background: white;
-        }
-        .form-input:focus { outline: none; border-color: var(--primary-color); background: var(--primary-soft); }
-        
-        .form-row { display: flex; gap: 12px; }
-        .form-row .form-group { flex: 1; }
-
-        .checkbox-group { display: flex; flex-direction: column; gap: 12px; }
-        .checkbox-item { 
-            display: flex; align-items: center; gap: 10px; font-size: 14px; 
-            background: white; padding: 12px 16px; border-radius: 12px; border: 1px solid #E5E6EB;
-        }
-        .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-color); }
-
-        .btn-group {
-            position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; padding-bottom: calc(20px + var(--safe-area-bottom));
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border-top: 1px solid #F0F2F5; display: flex; gap: 12px; z-index: 100;
-        }
-        .btn-flex { flex: 1; height: 50px; border-radius: 14px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .btn-flex:active { transform: scale(0.96); opacity: 0.9; }
-        .btn-outline { background: #F2F3F5; color: var(--text-secondary); }
-        .btn-primary { background: var(--primary-gradient); color: white; box-shadow: var(--shadow-lg); }
-    </style>
+    .patient-select-block { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(43,164,113,.14); }
+    .patient-select-label { font-size: 13px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
+    .patient-select {
+      width: 100%; height: 46px; border-radius: 14px; border: 1px solid #E5E6EB;
+      padding: 0 14px; background: rgba(255,255,255,.86); color: var(--text-main);
+      font-size: 14px; font-family: inherit; outline: none;
+    }
+    .patient-select:focus { border-color: var(--primary-color); background: #fff; }
+    .info-item { background: rgba(255,255,255,.72); border-radius: 14px; padding: 10px 8px; text-align: center; }
+    .info-label { font-size: 11px; color: var(--text-muted); }
+    .info-value { font-size: 13px; font-weight: 700; margin-top: 3px; color: var(--text-main); }
+    .notice-card {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px 16px; margin-bottom: 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #FFF7E6 0%, #FFFFFF 100%);
+      border: 1px solid rgba(250, 140, 22, .28);
+      box-shadow: 0 8px 24px rgba(250, 140, 22, .12);
+    }
+    .notice-icon { font-size: 24px; line-height: 1; }
+    .notice-title { font-size: 14px; font-weight: 800; color: #AD4E00; margin-bottom: 3px; }
+    .progress-line {
+      position: sticky; top: 65px; z-index: 9;
+      background: rgba(245,247,250,.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      padding: 10px 0 12px; margin-bottom: 6px;
+    }
+    .progress-text { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+    .progress-track { height: 8px; border-radius: 999px; background: #E5E6EB; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0; border-radius: inherit; background: var(--primary-gradient); transition: width .25s ease; }
+    .section-title { font-size: 16px; font-weight: 800; margin: 18px 0 12px; color: var(--text-main); }
+    .question-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-md);
+    }
+    .question-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+    .question-no {
+      flex: 0 0 auto; min-width: 42px; height: 26px; padding: 0 8px;
+      border-radius: 999px; background: var(--primary-soft); color: var(--primary-color);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800;
+    }
+    .question-title { flex: 1; font-size: 15px; font-weight: 750; color: var(--text-main); line-height: 1.55; }
+    .required { color: var(--danger-color); margin-left: 4px; }
+    .type-badge {
+      display: inline-flex; margin-left: 6px; padding: 2px 7px; border-radius: 999px;
+      background: #F2F3F5; color: var(--text-muted); font-size: 11px; font-weight: 700;
+    }
+    .option-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .option-list.compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .option-item {
+      position: relative; display: flex; gap: 9px; align-items: flex-start;
+      min-height: 44px; padding: 12px 12px;
+      border-radius: 14px; border: 1px solid #E5E6EB;
+      background: rgba(255,255,255,.75);
+      font-size: 13px; color: var(--text-secondary);
+      transition: all .18s ease;
+    }
+    .option-item input { margin-top: 2px; width: 17px; height: 17px; accent-color: var(--primary-color); flex: 0 0 auto; }
+    .option-item.checked { border-color: rgba(43,164,113,.55); background: var(--primary-soft); color: var(--text-main); box-shadow: 0 6px 16px rgba(43,164,113,.08); }
+    .option-text { flex: 1; line-height: 1.45; word-break: break-word; }
+    .extra-input {
+      width: 100%; min-height: 76px; resize: none;
+      margin-top: 12px; padding: 12px 14px;
+      border: 1px solid #E5E6EB; border-radius: 14px;
+      font-family: inherit; font-size: 14px; color: var(--text-main);
+      background: rgba(255,255,255,.75); outline: none;
+    }
+    .extra-input:focus { border-color: var(--primary-color); background: #fff; }
+    .btn-group {
+      position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto;
+      padding: 16px 20px; padding-bottom: calc(16px + var(--safe-area-bottom));
+      background: rgba(255,255,255,.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid #F0F2F5; z-index: 100;
+    }
+    .btn-primary {
+      width: 100%; height: 52px; border-radius: 16px; border: none;
+      background: var(--primary-gradient); color: #fff;
+      font-size: 16px; font-weight: 800; box-shadow: var(--shadow-lg);
+    }
+    .btn-primary:active { transform: scale(.98); opacity: .92; }
+    .error-tip { display: none; color: var(--danger-color); font-size: 12px; margin-top: 10px; }
+    .question-card.error { border-color: rgba(213,73,65,.45); box-shadow: 0 8px 24px rgba(213,73,65,.08); }
+    .question-card.error .error-tip { display: block; }
+    @media (max-width: 390px) { .option-list.compact { grid-template-columns: 1fr; } .info-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
-    <div class="header" style="position: sticky; top: 0; z-index: 10;">
-        <div class="back-btn" onclick="history.back()">✕</div>
-        <h1>现场补访录入</h1>
+  <div class="header">
+    <div class="back-btn" onclick="history.back()">✕</div>
+    <h1>现场补访录入</h1>
+  </div>
+
+  <div class="container" style="padding-bottom: 110px;">
+    <div class="top-card animate-up">
+      <div class="patient-row">
+        <div class="patient-main">
+          <div class="avatar" id="patientAvatar">?</div>
+          <div>
+            <div class="patient-name" id="patientName">请选择患者</div>
+            <div class="patient-meta" id="patientMeta">通用补访入口 · 需要先选择患者</div>
+          </div>
+        </div>
+        <div class="tag" id="followupModeTag">通用功能</div>
+      </div>
+
+      <div class="patient-select-block" id="patientSelectBlock">
+        <div class="patient-select-label">选择待补访患者</div>
+        <select class="patient-select" id="patientSelect" onchange="handlePatientSelect()">
+          <option value="">请选择患者...</option>
+          <option value="刘*财" data-meta="D14 实验室检查单核对">刘*财（D14 实验室检查单核对）</option>
+          <option value="张*兰" data-meta="失访召回后现场补访">张*兰（失访召回后现场补访）</option>
+          <option value="王*建" data-meta="D21 周期随访登记">王*建（D21 周期随访登记）</option>
+        </select>
+      </div>
+      <div class="info-grid">
+        <div class="info-item"><div class="info-label">补访类型</div><div class="info-value">现场补访</div></div>
+        <div class="info-item"><div class="info-label">执行人</div><div class="info-value">项目专员</div></div>
+        <div class="info-item"><div class="info-label">表单来源</div><div class="info-value">标准问卷</div></div>
+      </div>
     </div>
 
-    <div class="container" style="padding-bottom: 120px;">
-        <!-- 步骤进度 -->
-        <div class="step-indicator">
-            <div class="step-dot active">1</div>
-            <div class="step-dot">2</div>
-            <div class="step-dot">3</div>
-        </div>
-
-        <!-- 步骤 1: 患者与基础体征 -->
-        <div id="step1" class="animate-up">
-            <div class="section-title">补访对象确认</div>
-            <div class="card">
-                <div class="form-group">
-                    <label class="form-label">待补访患者</label>
-                    <select class="form-input">
-                        <option value="">请选择患者...</option>
-                        <option value="1" selected>刘*财 (D14 实验室检查单核对)</option>
-                        <option value="2">张*兰 (失访召回后补访)</option>
-                        <option value="3">李*明 (D21 补访登记)</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-top: 12px;">
-                    <label class="form-label">补访地点</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" class="form-input" value="上海交通大学附属瑞金医院" style="flex: 1;">
-                        <button class="btn-flex btn-outline" style="width: 50px; flex: none;">📍</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section-title">补访合规记录</div>
-            <div class="card">
-                <div class="form-group">
-                    <label class="form-label">补访原因说明</label>
-                    <select class="form-input">
-                        <option>常规随访未能如期完成</option>
-                        <option>临床关键指标（AE/SAE）需现场核实</option>
-                        <option>原始病历资料现场核对</option>
-                        <option>失访患者现场寻访</option>
-                        <option>其他原因</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-top: 12px;">
-                    <label class="form-label">访视签到照片</label>
-                    <div style="width: 100px; height: 100px; border: 1.5px dashed #E5E6EB; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; background: #F9FAFB;">
-                        <span style="font-size: 24px;">📸</span>
-                        <span style="font-size: 10px; margin-top: 4px;">拍照上传</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section-title">生命体征采集</div>
-            <div class="card">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">体重 (kg)</label>
-                        <input type="number" class="form-input" placeholder="0.0">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">心率 (bpm)</label>
-                        <input type="number" class="form-input" placeholder="0">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">血压 (mmHg)</label>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <input type="number" class="form-input" placeholder="收缩压" style="text-align: center;">
-                        <span style="color: var(--text-muted);">/</span>
-                        <input type="number" class="form-input" placeholder="舒张压" style="text-align: center;">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">ECOG 评分</label>
-                    <select class="form-input">
-                        <option>0 - 活动能力完全正常</option>
-                        <option>1 - 能从事轻体力活动</option>
-                        <option>2 - 生活自理但丧失工作能力</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- 步骤 2: 不良事件与用药 -->
-        <div id="step2" class="hidden">
-            <div class="section-title">不良事件 (AE) 核查</div>
-            <div class="card">
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">请询问患者自上次访视以来是否出现以下常见症状，若有请勾选并做详细记录：</p>
-                <div class="checkbox-group">
-                    <label class="checkbox-item">
-                        <input type="checkbox"> 皮肤发痒及红疹
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox"> 恶心、呕吐等胃肠道反应
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox"> 异常疲劳或虚弱
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox"> 其他异常情况
-                    </label>
-                </div>
-                <div class="form-group" style="margin-top: 16px;">
-                    <label class="form-label">具体情况补充说明</label>
-                    <textarea class="form-input" style="height: 80px; padding-top: 12px; resize: none;" placeholder="无。或详细描述发作时间、程度等..."></textarea>
-                </div>
-            </div>
-
-            <div class="section-title">合并用药记录</div>
-            <div class="card">
-                <div class="form-group">
-                    <label class="form-label">近期是否有新增合并用药？</label>
-                    <div style="display: flex; gap: 12px;">
-                        <button class="btn-flex btn-outline" style="background: var(--primary-soft); border-color: var(--primary-color); color: var(--primary-color);" onclick="alert('即将展开新增用药表单')">是</button>
-                        <button class="btn-flex btn-outline">否/无变化</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 步骤 3: 随访计划与确认 -->
-        <div id="step3" class="hidden">
-            <div class="section-title">下期计划</div>
-            <div class="card">
-                <div class="form-group">
-                    <label class="form-label">下次计划访视日期</label>
-                    <input type="date" class="form-input" value="2024-05-06">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">特别提醒备注</label>
-                    <input type="text" class="form-input" placeholder="例如：需空腹抽血">
-                </div>
-            </div>
-
-            <div class="section-title">提交确认</div>
-            <div class="card">
-                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
-                    本人确认以上录入数据已与患者或家属进行核实，数据真实有效，符合本研究操作规范 (SOP)。
-                </p>
-            </div>
-        </div>
+    <div class="notice-card animate-up">
+      <div class="notice-icon">&#128221;</div>
+      <div>
+        <div class="notice-title">请按问卷逐项完成现场补访</div>
+        <div class="page-desc">本页已改为单页表单，所有必填项完成后即可提交；多选题可同时选择多个症状。</div>
+      </div>
     </div>
 
-    <!-- 底部按钮 -->
-    <div class="btn-group">
-        <button class="btn-flex btn-outline" id="prevBtn" onclick="prevStep()" style="display: none;">上一步</button>
-        <button class="btn-flex btn-primary" id="nextBtn" onclick="nextStep()">下一步</button>
+    <div class="progress-line">
+      <div class="progress-text"><span id="progressText">已完成 0 / 10</span><span>必填问卷</span></div>
+      <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <script>
-        let currentStep = 1;
+    <div class="section-title">补访问卷</div>
+    <form id="followupForm"></form>
+  </div>
 
-        function nextStep() {
-            if (currentStep < 3) {
-                document.getElementById(`step${currentStep}`).classList.add('hidden');
-                document.getElementById(`step${currentStep}`).classList.remove('animate-up');
-                
-                const dots = document.querySelectorAll('.step-dot');
-                dots[currentStep-1].classList.remove('active');
-                dots[currentStep-1].classList.add('completed');
-                
-                currentStep++;
-                
-                const nextSection = document.getElementById(`step${currentStep}`);
-                nextSection.classList.remove('hidden');
-                // Force layout reflow to restart animation
-                void nextSection.offsetWidth; 
-                nextSection.classList.add('animate-up');
-                
-                dots[currentStep-1].classList.add('active');
-                
-                updateBtns();
-                window.scrollTo(0, 0);
-            } else {
-                alert('现场补访记录已提交并同步临床系统！');
-                window.location.href = 'index.html';
-            }
-        }
+  <div class="btn-group">
+    <button type="button" class="btn-primary" onclick="submitFollowup()">提交补访记录</button>
+  </div>
 
-        function prevStep() {
-            if (currentStep > 1) {
-                document.getElementById(`step${currentStep}`).classList.add('hidden');
-                document.getElementById(`step${currentStep}`).classList.remove('animate-up');
-                
-                const dots = document.querySelectorAll('.step-dot');
-                dots[currentStep-1].classList.remove('active');
+  <script>
+    const followupParams = new URLSearchParams(window.location.search);
+    const isTaskMode = followupParams.has('taskId');
 
-                currentStep--;
-                
-                const prevSection = document.getElementById(`step${currentStep}`);
-                prevSection.classList.remove('hidden');
-                void prevSection.offsetWidth;
-                prevSection.classList.add('animate-up');
-                
-                dots[currentStep-1].classList.remove('completed');
-                dots[currentStep-1].classList.add('active');
+    function getPatientInitial(name) {
+      return name && name !== '请选择患者' ? name.charAt(0) : '?';
+    }
 
-                updateBtns();
-                window.scrollTo(0, 0);
-            }
-        }
+    function setPatientDisplay(name, meta, modeText) {
+      document.getElementById('patientName').innerText = name;
+      document.getElementById('patientMeta').innerText = meta;
+      document.getElementById('patientAvatar').innerText = getPatientInitial(name);
+      document.getElementById('followupModeTag').innerText = modeText;
+    }
 
-        function updateBtns() {
-            document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
-            document.getElementById('nextBtn').innerText = currentStep === 3 ? '确认并提交' : '下一步';
-        }
-    </script>
+    function handlePatientSelect() {
+      const select = document.getElementById('patientSelect');
+      const option = select.options[select.selectedIndex];
+      if (!select.value) {
+        setPatientDisplay('请选择患者', '通用补访入口 · 需要先选择患者', '通用功能');
+        return;
+      }
+      setPatientDisplay(select.value, option.dataset.meta || '待现场补访', '通用功能');
+    }
+
+    function initFollowupPage() {
+      const selectBlock = document.getElementById('patientSelectBlock');
+      const select = document.getElementById('patientSelect');
+      const patientFromTask = followupParams.get('patient') || '刘*财';
+      if (isTaskMode) {
+        selectBlock.classList.add('hidden');
+        setPatientDisplay(patientFromTask, '系统任务已指定患者 · 直接填写补访表单', '补访任务');
+      } else {
+        selectBlock.classList.remove('hidden');
+        if (select) select.value = '';
+        handlePatientSelect();
+      }
+    }
+
+    const questions = [
+  {
+    "id": "001",
+    "question": "您是患者本人吗？后续随访是继续联系您吗？",
+    "type": "单选",
+    "required": true,
+    "items": [
+      "是本人，随访可联系本人",
+      "是本人，后续随访可能不便，需要联系代访人员（子女/配偶/监护人......）",
+      "不是本人，随访需要联系代访人员（子女/配偶/监护人......）"
+    ]
+  },
+  {
+    "id": "002",
+    "question": "我先帮您（或您父亲/您母亲/您太太/您先生......）登记一下基础信息，医生给您（或您父亲/您母亲/您太太/您先生......）处方上写的适应症是什么？（单选，必填，如患者表述不清可提醒查看病历）",
+    "type": "单选",
+    "required": true,
+    "items": [
+      "非小细胞肺癌",
+      "小细胞肺癌",
+      "肾癌",
+      "尿路上皮癌",
+      "食管癌",
+      "鼻咽癌",
+      "头颈鳞癌",
+      "三阴乳腺癌",
+      "乳腺癌（三阴以外）",
+      "淋巴瘤",
+      "黑色素瘤",
+      "肝癌",
+      "胃癌",
+      "结直肠癌",
+      "肉瘤",
+      "胆道癌",
+      "胰腺癌",
+      "宫颈癌",
+      "卵巢癌",
+      "其他"
+    ]
+  },
+  {
+    "id": "003",
+    "question": "您知道您（或您父亲/您母亲/您太太/您先生......）现在是几期了吗？",
+    "type": "单选",
+    "required": true,
+    "items": [
+      "I期",
+      "II期",
+      "III期",
+      "IV期",
+      "局部晚期",
+      "转移性",
+      "广泛期_仅小细胞肺癌"
+    ]
+  },
+  {
+    "id": "004",
+    "question": "您（或您父亲/您母亲/您太太/您先生......）目前是用的什么治疗方案？",
+    "type": "单选",
+    "required": true,
+    "items": [
+      "一线治疗_1L",
+      "一线治疗_1L（含转化治疗）_仅肝癌",
+      "二线治疗_2L",
+      "三线及以上治疗_3L及以上",
+      "诱导治疗_仅鼻咽癌",
+      "新辅助（可手术的）_仅肝癌",
+      "新辅助",
+      "辅助",
+      "保膀胱_仅尿路上皮癌",
+      "NMIBC_仅尿路上皮癌",
+      "围术期_仅非小细胞肺癌",
+      "SCLC_仅小细胞肺癌"
+    ]
+  },
+  {
+    "id": "005",
+    "question": "您（或您父亲/您母亲/您太太/您先生......）目前是否联合用药？",
+    "type": "单选",
+    "required": true,
+    "items": [
+      "拓益单药治疗",
+      "拓益联合化疗药，记录药品名称",
+      "拓益联合靶向药，记录药品名称",
+      "拓益联合其他药，记录药品名称"
+    ]
+  },
+  {
+    "id": "006",
+    "question": "您（或您父亲/您母亲/您太太/您先生......）目前是用的什么治疗方案，有没有手术过？",
+    "type": "单选",
+    "required": true,
+    "items": [
+      "已手术",
+      "未手术"
+    ]
+  },
+  {
+    "id": "007",
+    "question": "您（或您父亲/您母亲/您太太/您先生......）目前是否复发/转移？",
+    "type": "单选",
+    "required": true,
+    "items": [
+      "复发",
+      "转移",
+      "无转移",
+      "铂类化疗失败_仅尿路上皮癌"
+    ]
+  },
+  {
+    "id": "008",
+    "question": "那医嘱是让您（或您父亲/您母亲/您太太/您先生......）每2周一次去复诊用药，还是每3周一次？",
+    "type": "单选",
+    "required": true,
+    "items": [
+      "每2周一次",
+      "每3周一次"
+    ]
+  },
+  {
+    "id": "009",
+    "question": "您（或您父亲/您母亲/您太太/您先生......）这几天用完药，自己感觉症状有没有变化？是不是比之前还好一些？",
+    "type": "单选",
+    "required": true,
+    "items": [
+      "没变化，挺稳定",
+      "好转了",
+      "加重了",
+      "其他变化（您说一下：____）"
+    ]
+  },
+  {
+    "id": "010",
+    "question": "您（或您父亲/您母亲/您太太/您先生......）这几天吃饭睡觉都还正常吧？有没有出现不舒服的症状？（多选，必填）",
+    "type": "多选",
+    "required": true,
+    "items": [
+      "没有不舒服",
+      "恶心呕吐",
+      "发热",
+      "头痛",
+      "皮疹瘙痒",
+      "心律失常",
+      "咳嗽",
+      "免疫性肺炎",
+      "免疫性肝炎",
+      "免疫性甲状腺功能异常（甲减/甲亢）",
+      "免疫性皮疹",
+      "血淀粉酶升高或脂肪酶升高",
+      "心肌炎",
+      "胸炎",
+      "食欲减退",
+      "腹泻",
+      "乏力",
+      "失眠",
+      "口腔溃疡",
+      "关节痛",
+      "胸闷呼吸困难",
+      "免疫性腹泻/结肠炎",
+      "免疫性肾炎",
+      "免疫性高血糖症或一型糖尿病",
+      "血小板减少",
+      "胰腺炎",
+      "重症肌无力",
+      "其他（您详细说一下，我看看是不是需要去医院让医生处理：____）"
+    ]
+  }
+];
+
+    const needsRemark = new Set(['005', '009', '010']);
+    const form = document.getElementById('followupForm');
+    const progressText = document.getElementById('progressText');
+    const progressBar = document.getElementById('progressBar');
+
+    function isMulti(question) {
+      return question.type === '多选';
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderQuestions() {
+      form.innerHTML = questions.map((question, index) => {
+        const inputType = isMulti(question) ? 'checkbox' : 'radio';
+        const compact = question.items.length > 8 ? ' compact' : '';
+        const options = question.items.map((item, itemIndex) => `
+          <label class="option-item" data-qid="${question.id}">
+            <input type="${inputType}" name="q_${question.id}" value="${escapeHtml(item)}" onchange="handleOptionChange('${question.id}')">
+            <span class="option-text">${escapeHtml(item)}</span>
+          </label>
+        `).join('');
+        const remark = needsRemark.has(question.id)
+          ? `<textarea class="extra-input" name="remark_${question.id}" placeholder="补充说明（选填）"></textarea>`
+          : '';
+        return `
+          <div class="question-card" id="card_${question.id}">
+            <div class="question-head">
+              <span class="question-no">${question.id}</span>
+              <div class="question-title">
+                ${escapeHtml(question.question)}${question.required ? '<span class="required">*</span>' : ''}
+                <span class="type-badge">${escapeHtml(question.type)}</span>
+              </div>
+            </div>
+            <div class="option-list${compact}">${options}</div>
+            ${remark}
+            <div class="error-tip">请完成本题后再提交</div>
+          </div>
+        `;
+      }).join('');
+      updateProgress();
+    }
+
+    function handleOptionChange(questionId) {
+      document.querySelectorAll(`[data-qid="${questionId}"]`).forEach(label => {
+        const input = label.querySelector('input');
+        label.classList.toggle('checked', input.checked);
+      });
+      const card = document.getElementById(`card_${questionId}`);
+      if (card && hasAnswer(questionId)) card.classList.remove('error');
+      updateProgress();
+    }
+
+    function hasAnswer(questionId) {
+      return document.querySelectorAll(`input[name="q_${questionId}"]:checked`).length > 0;
+    }
+
+    function updateProgress() {
+      const requiredQuestions = questions.filter(q => q.required);
+      const done = requiredQuestions.filter(q => hasAnswer(q.id)).length;
+      progressText.textContent = `已完成 ${done} / ${requiredQuestions.length}`;
+      progressBar.style.width = `${requiredQuestions.length ? (done / requiredQuestions.length) * 100 : 100}%`;
+    }
+
+    function collectAnswers() {
+      return questions.map(question => {
+        const checked = Array.from(document.querySelectorAll(`input[name="q_${question.id}"]:checked`)).map(input => input.value);
+        const remarkEl = document.querySelector(`[name="remark_${question.id}"]`);
+        return {
+          id: question.id,
+          question: question.question,
+          type: question.type,
+          answer: isMulti(question) ? checked : (checked[0] || ''),
+          remark: remarkEl ? remarkEl.value.trim() : ''
+        };
+      });
+    }
+
+    function submitFollowup() {
+      const patientSelect = document.getElementById('patientSelect');
+      if (!isTaskMode && patientSelect && !patientSelect.value) {
+        alert('请先选择需要进行现场补访的患者');
+        patientSelect.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      let firstInvalid = null;
+      questions.forEach(question => {
+        const card = document.getElementById(`card_${question.id}`);
+        const invalid = question.required && !hasAnswer(question.id);
+        if (card) card.classList.toggle('error', invalid);
+        if (invalid && !firstInvalid) firstInvalid = card;
+      });
+      if (firstInvalid) {
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      const payload = {
+        patient: isTaskMode ? (followupParams.get('patient') || '') : (document.getElementById('patientSelect')?.value || ''),
+        scene: '现场补访',
+        submitTime: new Date().toISOString(),
+        answers: collectAnswers()
+      };
+      console.log('followup payload', payload);
+      alert('现场补访记录已提交！');
+      window.location.href = 'index.html';
+    }
+
+    initFollowupPage();
+    renderQuestions();
+  </script>
 </body>
 </html>

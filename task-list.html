@@ -97,8 +97,7 @@
             { id: 5, type: 'education', patient: '曹*云', gender: '女', age: 54, deadline: '剩余 2小时', desc: 'ADC 药物输注后教育', icon: '📚', color: 'bg-blue' },
             { id: 6, type: 'followup', patient: '刘*财', gender: '男', age: 62, deadline: '已逾期 1天', desc: 'D14 实验室检查检查单核对', icon: '📅', color: 'bg-green' },
             { id: 4, type: 'recall', patient: '张*兰', gender: '女', age: 48, deadline: '剩余 5小时', desc: '失访召回：第二次电话联系', icon: '📞', color: 'bg-rose' },
-            { id: 3, type: 'abnormal', patient: '陈*生', gender: '男', age: 70, deadline: '紧急', desc: 'AE 回流：皮疹数据漏填', icon: '⚠️', color: 'bg-purple' },
-            { id: 2, type: 'remind', patient: '赵*刚', gender: '男', age: 59, deadline: '明天', desc: '周期提醒：D21 住院预约确认', icon: '⏰', color: 'bg-teal' }
+            { id: 3, type: 'abnormal', patient: '陈*生', gender: '男', age: 70, deadline: '紧急', desc: 'AE 回流：皮疹数据漏填', icon: '⚠️', color: 'bg-purple' }
         ];
 
         function renderTasks(filter = 'all') {
@@ -112,7 +111,7 @@
             });
 
             list.innerHTML = filteredTasks.map(t => `
-                <div class="task-card animate-up ${t.type === 'abnormal' ? 'is-abnormal' : ''}" onclick="App.navigateTo('task-detail.html?id=' + ${t.id})">
+                <div class="task-card animate-up ${t.type === 'abnormal' ? 'is-abnormal' : ''}" onclick="App.navigateTo('${t.type === 'education' ? ('edu-form.html?taskId=' + t.id + '&patient=' + encodeURIComponent(t.patient)) : (t.type === 'followup' ? ('followup-form.html?taskId=' + t.id + '&patient=' + encodeURIComponent(t.patient)) : ('task-detail.html?id=' + t.id))}')">
                     <div class="task-icon-circle ${t.color}">${t.icon}</div>
                     <div class="task-main">
                         <div class="task-header">
