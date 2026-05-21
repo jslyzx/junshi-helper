@@ -34,7 +34,7 @@
     }
     .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
 
-    .patient-select-block { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(43,164,113,.14); }
+    
     .patient-select-label { font-size: 13px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
     .patient-select {
       width: 100%; height: 46px; border-radius: 14px; border: 1px solid #E5E6EB;
@@ -137,10 +137,8 @@
           <div class="avatar" id="patientAvatar">?</div>
           <div>
             <div class="patient-name" id="patientName">请选择患者</div>
-            <div class="patient-meta" id="patientMeta">通用补访入口 · 需要先选择患者</div>
           </div>
         </div>
-        <div class="tag" id="followupModeTag">通用功能</div>
       </div>
 
       <div class="patient-select-block" id="patientSelectBlock">
@@ -190,9 +188,7 @@
 
     function setPatientDisplay(name, meta, modeText) {
       document.getElementById('patientName').innerText = name;
-      document.getElementById('patientMeta').innerText = meta;
       document.getElementById('patientAvatar').innerText = getPatientInitial(name);
-      document.getElementById('followupModeTag').innerText = modeText;
     }
 
     function handlePatientSelect() {
