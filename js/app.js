@@ -59,7 +59,7 @@ const MockData = {
     ],
     // 补充材料
     supplements: [
-        { id: 1, patientId: 101, date: '2024-04-20', title: '补充材料: 门诊病历', content: '专员协助上传的门诊复查记录。', photos: ['https://picsum.photos/id/40/400/600'], type: 'info' }
+        { id: 1, patientId: 101, date: '2024-04-20', title: '补充材料: 门诊病历', content: '专员协助上传的门诊复查记录。', photos: ['https://im.gurl.eu.org/file/AgACAgEAAxkDAAEBizRqFCu7ZUZD4JkAATyZY8lKTL5Bf4sAAvQLaxvLS6BEmFWCM8s1_y0BAAMCAAN3AAM7BA.png'], type: 'info' }
     ],
     // 投诉记录
     complaints: [
