@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         .report-grid {
-            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;
         }
         .chart-box {
             background: white; border-radius: 20px; padding: 20px; margin-bottom: 16px;
@@ -35,6 +35,28 @@
             width: 44px; height: 44px; border-radius: 12px; background: #F0F2F5;
             display: flex; align-items: center; justify-content: center; font-size: 20px;
         }
+        .risk-analysis-card {
+            display: flex; align-items: center; justify-content: space-between; gap: 18px;
+            padding: 22px 20px;
+        }
+        .risk-pie {
+            width: 148px; height: 148px; border-radius: 50%;
+            background: conic-gradient(#FF4D4F 0 14.3%, #FAAD14 14.3% 45.3%, #2BA471 45.3% 100%);
+            position: relative; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+        }
+        .risk-pie::after {
+            content: "84\A患者";
+            white-space: pre; position: absolute; inset: 32px; border-radius: 50%;
+            background: #fff; display: flex; align-items: center; justify-content: center;
+            text-align: center; font-size: 15px; line-height: 1.4; font-weight: 700; color: var(--text-main);
+            box-shadow: 0 4px 12px rgba(20, 42, 35, 0.08);
+        }
+        .risk-legend { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+        .risk-legend-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .risk-name { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 13px; }
+        .risk-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+        .risk-value { font-weight: 700; color: var(--text-main); font-size: 14px; text-align: right; }
+        .risk-value small { display: block; font-size: 10px; color: var(--text-muted); font-weight: 500; margin-top: 1px; }
     </style>
 </head>
 <body>
@@ -47,9 +69,14 @@
         <!-- 核心统计 -->
         <div class="report-grid animate-up">
             <div class="card" style="margin-bottom:0">
-                <div style="font-size: 12px; color: var(--text-muted);">质控合格率</div>
-                <div style="font-size: 24px; font-weight: 700; color: var(--success-color); margin: 4px 0;">98.2%</div>
-                <div style="font-size: 11px; color: var(--text-secondary);">高于平均 2.4% ↑</div>
+                <div style="font-size: 12px; color: var(--text-muted);">红灯患者数</div>
+                <div style="font-size: 24px; font-weight: 700; color: #FF4D4F; margin: 4px 0;">12人</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">占比 14.3%</div>
+            </div>
+            <div class="card" style="margin-bottom:0">
+                <div style="font-size: 12px; color: var(--text-muted);">黄灯患者数</div>
+                <div style="font-size: 24px; font-weight: 700; color: #FAAD14; margin: 4px 0;">26人</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">占比 31.0%</div>
             </div>
             <div class="card" style="margin-bottom:0">
                 <div style="font-size: 12px; color: var(--text-muted);">随访逾期率</div>
@@ -80,46 +107,25 @@
             </div>
         </div>
 
-        <!-- 周月报下载 -->
+        <!-- 患者风险状态分析 -->
         <div class="section-title animate-up" style="animation-delay: 0.2s;" id="reports">
-            数据报告下载
+            患者风险状态分析
         </div>
-        <div class="card animate-up" style="animation-delay: 0.25s; padding: 0 20px;">
-            <div class="report-item-v2" onclick="alert('预览: 2024年4月第三周项目简报')">
-                <div class="file-icon-box" style="background:#EBF5FF; color:#1890FF">📊</div>
-                <div class="report-info">
-                    <div class="report-title">2024-W16 项目周报</div>
-                    <div class="report-meta">
-                        <span class="report-tag">PDF</span>
-                        <span class="report-tag">2.4MB</span>
-                        <span class="report-tag">2024-04-19</span>
-                    </div>
+        <div class="card risk-analysis-card animate-up" style="animation-delay: 0.25s;">
+            <div class="risk-pie" aria-label="红灯12人，黄灯26人，绿灯46人"></div>
+            <div class="risk-legend">
+                <div class="risk-legend-item">
+                    <div class="risk-name"><span class="risk-dot" style="background:#FF4D4F"></span>红灯患者</div>
+                    <div class="risk-value">12人<small>14.3%</small></div>
                 </div>
-                <div class="download-btn">↓</div>
-            </div>
-            <div class="report-item-v2" onclick="alert('预览: 2024年3月度数据质控报告')">
-                <div class="file-icon-box" style="background:#FFF2E6; color:#FA8C16">📋</div>
-                <div class="report-info">
-                    <div class="report-title">2024-M03 质控月报</div>
-                    <div class="report-meta">
-                        <span class="report-tag">PDF</span>
-                        <span class="report-tag">5.8MB</span>
-                        <span class="report-tag">2024-04-01</span>
-                    </div>
+                <div class="risk-legend-item">
+                    <div class="risk-name"><span class="risk-dot" style="background:#FAAD14"></span>黄灯患者</div>
+                    <div class="risk-value">26人<small>31.0%</small></div>
                 </div>
-                <div class="download-btn">↓</div>
-            </div>
-            <div class="report-item-v2" onclick="alert('预览: 院内协同沟通记录汇总')">
-                <div class="file-icon-box" style="background:#EAF7F1; color:#2BA471">👥</div>
-                <div class="report-info">
-                    <div class="report-title">院内协同情况汇总.xlsx</div>
-                    <div class="report-meta">
-                        <span class="report-tag">XLSX</span>
-                        <span class="report-tag">1.1MB</span>
-                        <span class="report-tag">2024-04-15</span>
-                    </div>
+                <div class="risk-legend-item">
+                    <div class="risk-name"><span class="risk-dot" style="background:#2BA471"></span>绿灯患者</div>
+                    <div class="risk-value">46人<small>54.7%</small></div>
                 </div>
-                <div class="download-btn">↓</div>
             </div>
         </div>
     </div>
