@@ -148,24 +148,52 @@
     <script>
         function loadTaskDetail() {
             const urlParams = new URLSearchParams(window.location.search);
-            const id = parseInt(urlParams.get('id'));
-            const todos = App.getTodos();
-            const task = todos.find(t => t.id === id) || todos[0];
+            const rawId = urlParams.get('id');
+            // 优先匹配 V0.4 九类任务，其次兼容旧的待办数据
+            const task = App.getTaskById(rawId) || App.getTodos().find(t => t.id === parseInt(rawId)) || App.getTasks()[0];
+            const tt = App.getTaskType(task.type);
 
             document.getElementById('priorityTag').innerText = task.priority === 'high' ? '紧急任务' : (task.priority === 'med' ? '常规任务' : '低优任务');
-            document.getElementById('taskType').innerText = task.type;
-            document.getElementById('taskTime').innerText = `更新时间：${task.time}`;
-            document.getElementById('patientName').innerText = task.patient;
+            document.getElementById('taskType').innerText = (tt ? tt.icon + ' ' + tt.label : task.type);
+            document.getElementById('taskTime').innerText = task.status === 'done' ? '已完成' : `计划时间：${task.planDate || task.time || '--'}`;
+            document.getElementById('patientName').innerText = task.patient + (task.disease ? `（${task.disease}${task.cycle && task.cycle !== '-' ? ' · ' + task.cycle + '周期' : ''}）` : '');
             document.getElementById('taskDesc').innerText = task.desc;
-            document.getElementById('planTime').innerText = `今日 ${task.time}`;
-            
-            if (task.priority === 'high') {
+            document.getElementById('planTime').innerText = task.planDate || task.time || '--';
+
+            if (task.status === 'done') {
+                document.querySelector('.info-value[style*="warning"]')?.removeAttribute('style');
+                document.getElementById('planTime').parentElement.nextElementSibling.querySelector('.info-value').innerText = '已完成';
+                document.getElementById('planTime').parentElement.nextElementSibling.querySelector('.info-value').style.color = 'var(--success-color)';
+            }
+
+            if (task.priority === 'high' || task.type === 'ae') {
                 document.getElementById('headerSection').style.background = 'linear-gradient(135deg, #D54941 0%, #B22222 100%)';
                 document.getElementById('headerSection').style.boxShadow = '0 4px 20px rgba(213, 73, 65, 0.2)';
             }
+            window.__curTask = task;
         }
 
         function completeTask() {
+            const task = window.__curTask || {};
+            const typeKey = task.type || '';
+            const pid = task.id ? ('?taskId=' + task.id) : '';
+            const pstr = task.patient ? ((pid ? '&' : '?') + 'patient=' + encodeURIComponent(task.patient)) : '';
+            const ROUTE = {
+                auth:     'task-list.html',
+                profile:  'followup-form.html?mode=profile' + (task.id ? '&taskId=' + task.id : ''),
+                cycle:    'followup-form.html?mode=cycle' + (task.id ? '&taskId=' + task.id : ''),
+                recall:   'recall-form.html' + pid + pstr,
+                withdraw: 'withdraw-form.html' + pid,
+                ae:       'followup-form.html?mode=ae' + (task.id ? '&taskId=' + task.id : ''),
+                special:  'complaint-list.html' + pid,
+                pv:       'abnormal-form.html' + pid + pstr,
+                patient:  'task-list.html?type=patient'
+            };
+            if (ROUTE[typeKey]) {
+                window.location.href = ROUTE[typeKey];
+                return;
+            }
+            // 兼容旧待办类型
             const taskType = document.getElementById('taskType').innerText;
             if (taskType.includes('入组')) {
                 window.location.href = 'enroll-form.html';

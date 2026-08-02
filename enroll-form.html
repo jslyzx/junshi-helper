@@ -291,9 +291,9 @@
 
         function simulateOCR(type) {
             const results = {
-                'idcard-front': { name: '林建国', idCard: '310115199203151234' },
-                diagnosis: { disease: '非小细胞肺癌' },
-                prescription: { medication: 'PD-1 单抗' },
+                'idcard-front': { name: '林建国', idCard: '310115196803151234' },
+                diagnosis: { disease: '食管鳞状细胞癌' },
+                prescription: { medication: '拓益（特瑞普利单抗）' },
                 consent: { status: '已签署' }
             };
             return results[type] || {};
@@ -379,8 +379,11 @@
             if (!name || !doctor || !disease) { alert('请填写姓名、指定医生和确诊疾病'); return; }
             if (!phone || !/^1\d{10}$/.test(phone)) { alert('请输入正确的手机号码'); return; }
             if (consentPages.length === 0) { alert('请上传知情同意书'); return; }
-            alert('申请提交成功！');
-            history.back();
+            if (confirm('✅ 入组申请提交成功！\n\n已生成「首触达建档」任务（T+0~T+3 天内现场完成），是否立即前往建档？')) {
+                window.location.href = 'followup-form.html?mode=profile';
+            } else {
+                history.back();
+            }
         }
 
         let viewerPhotos = [];

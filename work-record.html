@@ -95,6 +95,12 @@
             </button>
         </div>
 
+        <!-- 随访记录（本地提交） -->
+        <div class="section-title">随访记录</div>
+        <div class="record-card" id="followupRecords">
+            <!-- 由 JS 渲染 -->
+        </div>
+
         <!-- 历史记录 -->
         <div class="section-title">最近记录</div>
         <div class="record-card">
@@ -145,7 +151,30 @@
         </div>
     </div>
 
+    <script src="js/app.js"></script>
     <script>
+        // 渲染本地随访记录
+        (function renderFollowupRecords() {
+            const records = App.getFollowupRecords();
+            const box = document.getElementById('followupRecords');
+            if (!records.length) {
+                box.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:12px 0;">暂无随访记录，完成一次随访后在此展示</div>';
+                return;
+            }
+            box.innerHTML = records.map(r => `
+                <div style="padding: 12px 0; border-bottom: 1px solid #F0F2F5;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span style="font-size:14px; font-weight:700;">${r.patient} · ${r.taskType}</span>
+                        ${r.urgent ? '<span style="font-size:10px; font-weight:700; color:var(--danger-color); background:#FDEEEE; padding:2px 8px; border-radius:4px;">🚨 含紧急线索</span>' : '<span style="font-size:10px; color:var(--success-color); background:#EAF7F1; padding:2px 8px; border-radius:4px;">已提交</span>'}
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.6;">${r.summary || '（无小结）'}</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:6px; display:flex; justify-content:space-between;">
+                        <span>升级/转交：${(r.escalate || []).join('、')}</span>
+                        <span>${r.submitTime}</span>
+                    </div>
+                </div>`).join('');
+        })();
+
         document.getElementById('fileInput').addEventListener('change', function(e) {
             const files = e.target.files;
             const container = document.getElementById('selectedFiles');

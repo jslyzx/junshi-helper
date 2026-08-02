@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>退出/拒访管理 - 项目专员端</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .top-card {
+      background: linear-gradient(135deg, #F2F3F5 0%, #FFFFFF 100%);
+      border: 1px solid #E5E6EB; border-radius: 20px; padding: 16px; margin-bottom: 14px;
+      box-shadow: var(--shadow-md);
+    }
+    .patient-main { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, #86909C 0%, #4E5969 100%); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px;
+    }
+    .patient-name { font-size: 17px; font-weight: 800; color: var(--text-main); }
+    .patient-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .notice-card {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px 16px; margin-bottom: 16px; border-radius: 18px;
+      background: linear-gradient(135deg, #FFF7E6 0%, #FFFFFF 100%);
+      border: 1px solid rgba(250, 140, 22, .28);
+    }
+    .notice-title { font-size: 13px; font-weight: 800; color: #AD4E00; margin-bottom: 3px; }
+    .notice-text { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+
+    .question-card {
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      border-radius: 20px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-md);
+    }
+    .question-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+    .question-no {
+      flex: 0 0 auto; min-width: 40px; height: 24px; padding: 0 8px;
+      border-radius: 999px; background: var(--primary-soft); color: var(--primary-color);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;
+    }
+    .question-title { flex: 1; font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.55; }
+    .required { color: var(--danger-color); margin-left: 3px; }
+    .script-btn {
+      flex: 0 0 auto; border: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 4px 9px; border-radius: 999px;
+      background: #FFF7E6; color: #AD4E00; font-size: 11px; font-weight: 700;
+    }
+    .option-list { display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .option-item {
+      display: flex; gap: 9px; align-items: flex-start;
+      min-height: 42px; padding: 11px 12px;
+      border-radius: 13px; border: 1px solid #E5E6EB;
+      background: rgba(255,255,255,.75); font-size: 13px; color: var(--text-secondary);
+      transition: all .18s ease; cursor: pointer;
+    }
+    .option-item input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--primary-color); flex: 0 0 auto; }
+    .option-item.checked { border-color: rgba(43,164,113,.55); background: var(--primary-soft); color: var(--text-main); }
+    .option-text { flex: 1; line-height: 1.45; }
+    .text-input, .extra-input {
+      width: 100%; padding: 12px 14px;
+      border: 1px solid #E5E6EB; border-radius: 13px;
+      font-family: inherit; font-size: 14px; color: var(--text-main);
+      background: rgba(255,255,255,.75); outline: none;
+    }
+    .extra-input { min-height: 90px; resize: none; }
+    .text-input:focus, .extra-input:focus { border-color: var(--primary-color); background: #fff; }
+    .cond-note {
+      margin-top: 10px; font-size: 12px; color: var(--info-color); background: #E8F3FF;
+      border-radius: 10px; padding: 8px 12px; line-height: 1.6;
+    }
+    .error-tip { display: none; color: var(--danger-color); font-size: 12px; margin-top: 8px; }
+    .question-card.error { border-color: rgba(213,73,65,.45); }
+    .question-card.error .error-tip { display: block; }
+
+    .sheet-mask {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1500;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-mask.active { display: flex; }
+    .sheet {
+      width: 100%; max-width: 500px; background: white;
+      border-radius: 24px 24px 0 0; padding: 20px 20px calc(24px + var(--safe-area-bottom));
+      animation: slideUp .28s ease;
+    }
+    .sheet-handle { width: 40px; height: 4px; border-radius: 2px; background: #E5E6EB; margin: 0 auto 14px; }
+    .sheet-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+    .sheet-q { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+    .sheet-script { background: #FFF7E6; border-radius: 14px; padding: 14px 16px; font-size: 14px; color: #7A3E00; line-height: 1.8; }
+    .sheet-close {
+      margin-top: 16px; width: 100%; height: 44px; border: none; border-radius: 14px;
+      background: var(--primary-soft); color: var(--primary-color); font-size: 14px; font-weight: 700;
+    }
+
+    .btn-group {
+      position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto;
+      padding: 14px 20px; padding-bottom: calc(14px + var(--safe-area-bottom));
+      background: rgba(255,255,255,.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid #F0F2F5; z-index: 100;
+    }
+    .btn-danger {
+      width: 100%; height: 50px; border-radius: 16px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, #86909C 0%, #4E5969 100%); color: #fff;
+      font-size: 16px; font-weight: 800; box-shadow: var(--shadow-lg);
+    }
+    .btn-danger:active { transform: scale(.98); opacity: .92; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="back-btn" onclick="history.back()">✕</div>
+    <h1>退出/拒访管理</h1>
+    <div style="width: 32px;"></div>
+  </div>
+
+  <div class="container" style="padding-bottom: 120px;">
+    <div class="top-card animate-up">
+      <div class="patient-main">
+        <div class="avatar" id="patientAvatar">?</div>
+        <div>
+          <div class="patient-name" id="patientName">--</div>
+          <div class="patient-meta" id="patientMeta">--</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notice-card animate-up">
+      <div style="font-size: 22px;">🚪</div>
+      <div>
+        <div class="notice-title">尊重患者意愿，不得施压</div>
+        <div class="notice-text">不得暗示退出会影响治疗。退出/拒访后停止常规触达；当次获知的 AE 或特殊情形仍需记录并转交专业团队。</div>
+      </div>
+    </div>
+
+    <div id="formRoot"></div>
+  </div>
+
+  <div class="btn-group">
+    <button type="button" class="btn-danger" onclick="submitWithdraw()">确认提交 · 更新为「退出/拒访」</button>
+  </div>
+
+  <div class="sheet-mask" id="scriptSheet" onclick="if(event.target===this) closeScript()">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">📖 参考话术</div>
+      <div class="sheet-q" id="sheetQ"></div>
+      <div class="sheet-script" id="sheetScript"></div>
+      <button class="sheet-close" onclick="closeScript()">收起</button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    /* 退出/拒访管理模块（对齐 V0.4 问卷库 Q110-Q115 + 安全性总筛衔接） */
+    const Q = {
+      q110: { no:'Q110', type:'radio', required:true, title:'退出/拒访类型',
+              script:'理解，我们尊重您的决定。我确认一下您希望停止哪类随访或联系。',
+              options:[{v:'完全退出项目'},{v:'拒绝本次随访'},{v:'要求停止电话联系'},{v:'要求更换联系人'},{v:'其他'}] },
+      q111: { no:'Q111', type:'radio', required:true, title:'退出/拒访原因',
+              script:'方便的话，我帮您记录一下原因，方便项目更新状态。（不得施压或暗示退出影响治疗）',
+              options:[{v:'不想被打扰'},{v:'已转院'},{v:'已停药'},{v:'家属代管'},{v:'身体原因'},{v:'对服务不满意'},{v:'其他'}] },
+      q112: { no:'Q112', type:'radio', required:true, title:'当次是否有安全性信息',
+              script:'最后再确认一下，这次沟通中有没有提到用药后不适、检查异常或其他需要记录的情况？',
+              options:[{v:'未提到'},{v:'有', show:['q112a','q112b'], note:'当次获知的AE或特殊情形仍需记录并转交'},{v:'不确定', show:['q112a','q112b'], note:'当次获知的AE或特殊情形仍需记录并转交'}] },
+      q112a:{ no:'Q49', type:'multi', required:true, title:'安全性信息分类', hidden:true,
+              script:'您刚才提到的情况，我帮您分一下类型，方便后续专业团队处理。',
+              options:[{v:'身体不适/症状'},{v:'检查异常'},{v:'门诊/急诊/住院'},{v:'妊娠/哺乳/父源暴露'},{v:'用药错误'},{v:'产品质量问题'},{v:'缺乏疗效/疾病进展'},{v:'误用/过量'}] },
+      q112b:{ no:'Q51', type:'textarea', required:true, title:'安全性信息简述', hidden:true,
+              script:'我先按您说的情况客观记录，不判断是不是药品导致。', placeholder:'仅记录事实，不判断因果关系' },
+      q113: { no:'Q113', type:'radio', required:true, title:'停止触达确认',
+              script:'我会按您的要求更新联系限制，后续不做不必要的打扰。',
+              options:[{v:'是'},{v:'否'},{v:'需项目经理确认'}] },
+      q114: { no:'Q114', type:'radio', required:true, title:'必要安全信息渠道',
+              script:'如后续仍有必要安全性信息需要处理，项目会按既定流程确认合适的联系渠道。',
+              options:[{v:'保留'},{v:'不保留'},{v:'由项目/PV确认'}] },
+      q115: { no:'Q115', type:'textarea', required:true, title:'退出/拒访记录',
+              script:'我记录一下本次拒访时间、沟通对象和您的原话。',
+              placeholder:'记录拒访时间、沟通对象、患者原话' }
+    };
+
+    const params = new URLSearchParams(location.search);
+    const taskId = params.get('taskId') || '';
+    const task = taskId ? App.getTaskById(taskId) : null;
+    const answers = {};
+
+    function escapeHtml(t) {
+      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderHeader() {
+      const pName = task ? task.patient : (params.get('patient') || '王*华');
+      document.getElementById('patientName').innerText = pName;
+      document.getElementById('patientAvatar').innerText = pName.charAt(0);
+      document.getElementById('patientMeta').innerText = task
+        ? `${task.gender} · ${task.age}岁 · ${task.disease} · ${task.dept}`
+        : '演示模式 · 未关联任务';
+    }
+
+    function renderQuestion(qid) {
+      const q = Q[qid];
+      let body = '';
+      if (q.type === 'radio' || q.type === 'multi') {
+        const inputType = q.type === 'multi' ? 'checkbox' : 'radio';
+        body = '<div class="option-list">' + q.options.map(o => `
+          <label class="option-item" data-qid="${qid}">
+            <input type="${inputType}" name="q_${qid}" value="${escapeHtml(o.v)}" onchange="handleOption('${qid}')">
+            <span class="option-text">${escapeHtml(o.v)}</span>
+          </label>`).join('') + '</div>';
+      } else {
+        body = `<textarea class="extra-input" name="q_${qid}" placeholder="${q.placeholder || '请填写'}" oninput="handleText('${qid}')"></textarea>`;
+      }
+      return `
+        <div class="question-card${q.hidden ? ' hidden' : ''}" id="card_${qid}">
+          <div class="question-head">
+            <span class="question-no">${q.no}</span>
+            <div class="question-title">${escapeHtml(q.title)}${q.required ? '<span class="required">*</span>' : ''}</div>
+            <button type="button" class="script-btn" onclick="openScript('${qid}')">📖 话术</button>
+          </div>
+          ${body}
+          <div class="cond-note hidden" id="note_${qid}"></div>
+          <div class="error-tip">请完成本题后再提交</div>
+        </div>`;
+    }
+
+    function renderForm() {
+      document.getElementById('formRoot').innerHTML = Object.keys(Q).map(renderQuestion).join('');
+    }
+
+    function openScript(qid) {
+      const q = Q[qid];
+      document.getElementById('sheetQ').innerText = q.no + ' · ' + q.title;
+      document.getElementById('sheetScript').innerText = q.script || '';
+      document.getElementById('scriptSheet').classList.add('active');
+    }
+    function closeScript() { document.getElementById('scriptSheet').classList.remove('active'); }
+
+    function getOption(qid, value) { return (Q[qid].options || []).find(o => o.v === value); }
+
+    function handleOption(qid) {
+      const q = Q[qid];
+      const values = Array.from(document.querySelectorAll(`input[name="q_${qid}"]:checked`)).map(i => i.value);
+      answers[qid] = q.type === 'multi' ? values : (values[0] || undefined);
+      if (!answers[qid] || (Array.isArray(answers[qid]) && !answers[qid].length)) delete answers[qid];
+
+      document.querySelectorAll(`[data-qid="${qid}"]`).forEach(label => {
+        label.classList.toggle('checked', label.querySelector('input').checked);
+      });
+      document.getElementById('card_' + qid).classList.remove('error');
+
+      // 条件展开
+      if (q.options) {
+        const toShow = new Set();
+        values.forEach(v => (getOption(qid, v).show || []).forEach(s => toShow.add(s)));
+        const allChildren = new Set();
+        q.options.forEach(o => (o.show || []).forEach(s => allChildren.add(s)));
+        allChildren.forEach(child => {
+          const card = document.getElementById('card_' + child);
+          card.classList.toggle('hidden', !toShow.has(child));
+          if (!toShow.has(child)) {
+            delete answers[child];
+            card.querySelectorAll('input').forEach(i => i.checked = false);
+            card.querySelectorAll('textarea').forEach(t => t.value = '');
+            card.querySelectorAll('.option-item').forEach(l => l.classList.remove('checked'));
+          }
+        });
+        const notes = values.map(v => getOption(qid, v)).filter(o => o && o.note).map(o => '💡 ' + o.note);
+        const noteEl = document.getElementById('note_' + qid);
+        noteEl.classList.toggle('hidden', !notes.length);
+        noteEl.innerHTML = notes.join('<br>');
+      }
+    }
+
+    function handleText(qid) {
+      const el = document.querySelector(`textarea[name="q_${qid}"]`);
+      answers[qid] = el.value.trim() || undefined;
+      if (!answers[qid]) delete answers[qid];
+      document.getElementById('card_' + qid).classList.remove('error');
+    }
+
+    function isVisible(qid) { return !document.getElementById('card_' + qid).classList.contains('hidden'); }
+
+    function submitWithdraw() {
+      let firstInvalid = null;
+      Object.keys(Q).forEach(qid => {
+        const q = Q[qid];
+        const invalid = q.required && isVisible(qid) && !answers[qid];
+        const card = document.getElementById('card_' + qid);
+        card.classList.toggle('error', invalid);
+        if (invalid && !firstInvalid) firstInvalid = card;
+      });
+      if (firstInvalid) {
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      App.saveFollowupRecord({
+        taskId, mode: 'withdraw',
+        patient: document.getElementById('patientName').innerText,
+        taskType: '退出/拒访管理',
+        summary: answers['q115'] || '',
+        escalate: ['项目经理'],
+        urgent: false,
+        answers
+      });
+      alert('✅ 已提交退出/拒访记录。\n患者状态已更新为「退出/拒访」，后续将停止常规触达。');
+      location.href = 'task-list.html?type=withdraw';
+    }
+
+    renderHeader();
+    renderForm();
+  </script>
+</body>
+</html>

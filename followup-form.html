@@ -3,484 +3,812 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>现场补访记录 - 项目专员端</title>
+  <title>随访执行 - 项目专员端</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
     .page-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
     .top-card {
       background: linear-gradient(135deg, #EAF7F1 0%, #FFFFFF 100%);
       border: 1px solid rgba(43, 164, 113, 0.18);
-      border-radius: 20px;
-      padding: 18px;
-      margin-bottom: 16px;
+      border-radius: 20px; padding: 16px; margin-bottom: 14px;
       box-shadow: var(--shadow-md);
     }
-    .patient-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .patient-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .patient-main { display: flex; align-items: center; gap: 12px; }
     .avatar {
       width: 44px; height: 44px; border-radius: 50%;
       background: var(--primary-gradient); color: #fff;
       display: flex; align-items: center; justify-content: center;
       font-weight: 800; font-size: 18px;
-      box-shadow: 0 10px 24px rgba(43,164,113,.22);
     }
-    .patient-name { font-size: 18px; font-weight: 800; color: var(--text-main); }
+    .patient-name { font-size: 17px; font-weight: 800; color: var(--text-main); }
     .patient-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .tag {
+    .task-type-tag {
       display: inline-flex; align-items: center; gap: 4px;
-      padding: 6px 10px; border-radius: 999px;
-      background: rgba(43, 164, 113, .1); color: var(--primary-color);
-      font-size: 12px; font-weight: 700; white-space: nowrap;
+      padding: 5px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap;
     }
-    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+    .report-card {
+      border-radius: 18px; padding: 14px 16px; margin-bottom: 14px;
+      background: linear-gradient(135deg, #FDEEEE 0%, #FFFFFF 100%);
+      border: 1px solid rgba(213, 73, 65, .3);
+    }
+    .report-title { font-size: 13px; font-weight: 800; color: var(--danger-color); margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .report-text { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
 
-    
-    .patient-select-label { font-size: 13px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
-    .patient-select {
-      width: 100%; height: 46px; border-radius: 14px; border: 1px solid #E5E6EB;
-      padding: 0 14px; background: rgba(255,255,255,.86); color: var(--text-main);
-      font-size: 14px; font-family: inherit; outline: none;
+    .module-head {
+      display: flex; align-items: center; gap: 10px; margin: 22px 0 12px;
     }
-    .patient-select:focus { border-color: var(--primary-color); background: #fff; }
-    .info-item { background: rgba(255,255,255,.72); border-radius: 14px; padding: 10px 8px; text-align: center; }
-    .info-label { font-size: 11px; color: var(--text-muted); }
-    .info-value { font-size: 13px; font-weight: 700; margin-top: 3px; color: var(--text-main); }
-    .notice-card {
-      display: flex; gap: 12px; align-items: flex-start;
-      padding: 14px 16px; margin-bottom: 16px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #FFF7E6 0%, #FFFFFF 100%);
-      border: 1px solid rgba(250, 140, 22, .28);
-      box-shadow: 0 8px 24px rgba(250, 140, 22, .12);
+    .module-icon {
+      width: 34px; height: 34px; border-radius: 10px; flex: 0 0 auto;
+      background: var(--primary-soft); display: flex; align-items: center; justify-content: center; font-size: 17px;
     }
-    .notice-icon { font-size: 24px; line-height: 1; }
-    .notice-title { font-size: 14px; font-weight: 800; color: #AD4E00; margin-bottom: 3px; }
-    .progress-line {
-      position: sticky; top: 65px; z-index: 9;
-      background: rgba(245,247,250,.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      padding: 10px 0 12px; margin-bottom: 6px;
+    .module-title { font-size: 16px; font-weight: 800; color: var(--text-main); }
+    .module-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .module-block.cond-hidden { display: none; }
+
+    .sys-field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .sys-field {
+      background: rgba(255,255,255,.8); border: 1px solid #EEF1F4; border-radius: 12px; padding: 9px 12px;
     }
-    .progress-text { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
-    .progress-track { height: 8px; border-radius: 999px; background: #E5E6EB; overflow: hidden; }
-    .progress-bar { height: 100%; width: 0; border-radius: inherit; background: var(--primary-gradient); transition: width .25s ease; }
-    .section-title { font-size: 16px; font-weight: 800; margin: 18px 0 12px; color: var(--text-main); }
+    .sys-field .k { font-size: 10px; color: var(--text-muted); }
+    .sys-field .v { font-size: 13px; font-weight: 700; color: var(--text-main); margin-top: 2px; }
+
     .question-card {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 18px;
-      margin-bottom: 14px;
-      box-shadow: var(--shadow-md);
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      border-radius: 20px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-md);
     }
-    .question-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+    .question-card.branch { border-left: 3px solid var(--danger-color); }
+    .question-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
     .question-no {
-      flex: 0 0 auto; min-width: 42px; height: 26px; padding: 0 8px;
+      flex: 0 0 auto; min-width: 40px; height: 24px; padding: 0 8px;
       border-radius: 999px; background: var(--primary-soft); color: var(--primary-color);
-      display: inline-flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 800;
+      display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;
     }
-    .question-title { flex: 1; font-size: 15px; font-weight: 750; color: var(--text-main); line-height: 1.55; }
-    .required { color: var(--danger-color); margin-left: 4px; }
-    .type-badge {
-      display: inline-flex; margin-left: 6px; padding: 2px 7px; border-radius: 999px;
-      background: #F2F3F5; color: var(--text-muted); font-size: 11px; font-weight: 700;
+    .question-title { flex: 1; font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.55; }
+    .required { color: var(--danger-color); margin-left: 3px; }
+    .script-btn {
+      flex: 0 0 auto; border: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 4px 9px; border-radius: 999px;
+      background: #FFF7E6; color: #AD4E00; font-size: 11px; font-weight: 700;
     }
-    .option-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .option-list.compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .script-btn:active { transform: scale(0.95); }
+    .option-list { display: grid; grid-template-columns: 1fr; gap: 8px; }
     .option-item {
       position: relative; display: flex; gap: 9px; align-items: flex-start;
-      min-height: 44px; padding: 12px 12px;
-      border-radius: 14px; border: 1px solid #E5E6EB;
-      background: rgba(255,255,255,.75);
-      font-size: 13px; color: var(--text-secondary);
-      transition: all .18s ease;
+      min-height: 42px; padding: 11px 12px;
+      border-radius: 13px; border: 1px solid #E5E6EB;
+      background: rgba(255,255,255,.75); font-size: 13px; color: var(--text-secondary);
+      transition: all .18s ease; cursor: pointer;
     }
-    .option-item input { margin-top: 2px; width: 17px; height: 17px; accent-color: var(--primary-color); flex: 0 0 auto; }
-    .option-item.checked { border-color: rgba(43,164,113,.55); background: var(--primary-soft); color: var(--text-main); box-shadow: 0 6px 16px rgba(43,164,113,.08); }
+    .option-item input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--primary-color); flex: 0 0 auto; }
+    .option-item.checked { border-color: rgba(43,164,113,.55); background: var(--primary-soft); color: var(--text-main); }
+    .option-item.preselect { border-color: rgba(227,115,24,.5); background: #FFF7E6; color: #AD4E00; }
+    .option-item .urgent-dot {
+      flex: 0 0 auto; font-size: 10px; color: var(--danger-color); font-weight: 800;
+      border: 1px solid rgba(213,73,65,.4); border-radius: 4px; padding: 0 4px; margin-top: 1px;
+    }
     .option-text { flex: 1; line-height: 1.45; word-break: break-word; }
-    .extra-input {
-      width: 100%; min-height: 76px; resize: none;
-      margin-top: 12px; padding: 12px 14px;
-      border: 1px solid #E5E6EB; border-radius: 14px;
+    .text-input, .date-input, .extra-input {
+      width: 100%; padding: 12px 14px;
+      border: 1px solid #E5E6EB; border-radius: 13px;
       font-family: inherit; font-size: 14px; color: var(--text-main);
       background: rgba(255,255,255,.75); outline: none;
     }
-    .extra-input:focus { border-color: var(--primary-color); background: #fff; }
+    .extra-input { min-height: 80px; resize: none; }
+    .text-input:focus, .date-input:focus, .extra-input:focus { border-color: var(--primary-color); background: #fff; }
+    .safety-hint {
+      margin-top: 10px; font-size: 11px; color: #AD4E00; background: #FFF7E6;
+      border-radius: 10px; padding: 8px 12px; line-height: 1.6;
+    }
+    .safety-hint.ok { color: var(--primary-color); background: var(--primary-light); }
+    .cond-note {
+      margin-top: 10px; font-size: 12px; color: var(--info-color); background: #E8F3FF;
+      border-radius: 10px; padding: 8px 12px; line-height: 1.6;
+    }
+    .error-tip { display: none; color: var(--danger-color); font-size: 12px; margin-top: 8px; }
+    .question-card.error { border-color: rgba(213,73,65,.45); }
+    .question-card.error .error-tip { display: block; }
+
+    /* 紧急升级横幅 */
+    .urgent-banner {
+      position: fixed; left: 0; right: 0; bottom: calc(84px + var(--safe-area-bottom));
+      max-width: 500px; margin: 0 auto; padding: 0 16px; z-index: 99;
+    }
+    .urgent-banner-inner {
+      background: linear-gradient(135deg, #D54941 0%, #B22222 100%);
+      color: white; border-radius: 16px; padding: 12px 16px;
+      display: flex; gap: 10px; align-items: flex-start;
+      box-shadow: 0 12px 32px rgba(213,73,65,.4);
+      animation: urgentPulse 1.2s ease-in-out infinite;
+    }
+    @keyframes urgentPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.015); } }
+    .urgent-banner .u-icon { font-size: 22px; line-height: 1.2; }
+    .urgent-banner .u-title { font-size: 13px; font-weight: 800; margin-bottom: 2px; }
+    .urgent-banner .u-text { font-size: 12px; opacity: .92; line-height: 1.5; }
+
+    /* 话术弹层 */
+    .sheet-mask {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1500;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-mask.active { display: flex; }
+    .sheet {
+      width: 100%; max-width: 500px; background: white;
+      border-radius: 24px 24px 0 0; padding: 20px 20px calc(24px + var(--safe-area-bottom));
+      animation: slideUp .28s ease;
+    }
+    .sheet-handle { width: 40px; height: 4px; border-radius: 2px; background: #E5E6EB; margin: 0 auto 14px; }
+    .sheet-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .sheet-q { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+    .sheet-script {
+      background: #FFF7E6; border-radius: 14px; padding: 14px 16px;
+      font-size: 14px; color: #7A3E00; line-height: 1.8;
+    }
+    .sheet-close {
+      margin-top: 16px; width: 100%; height: 44px; border: none; border-radius: 14px;
+      background: var(--primary-soft); color: var(--primary-color); font-size: 14px; font-weight: 700;
+    }
+
+    .progress-line {
+      position: sticky; top: 64px; z-index: 90;
+      background: rgba(245,247,250,.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      padding: 8px 0 10px; margin-bottom: 4px;
+    }
+    .progress-text { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+    .progress-track { height: 7px; border-radius: 999px; background: #E5E6EB; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0; border-radius: inherit; background: var(--primary-gradient); transition: width .25s ease; }
+
     .btn-group {
       position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto;
-      padding: 16px 20px; padding-bottom: calc(16px + var(--safe-area-bottom));
+      padding: 14px 20px; padding-bottom: calc(14px + var(--safe-area-bottom));
       background: rgba(255,255,255,.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
       border-top: 1px solid #F0F2F5; z-index: 100;
     }
     .btn-primary {
-      width: 100%; height: 52px; border-radius: 16px; border: none;
+      width: 100%; height: 50px; border-radius: 16px; border: none; cursor: pointer;
       background: var(--primary-gradient); color: #fff;
       font-size: 16px; font-weight: 800; box-shadow: var(--shadow-lg);
     }
     .btn-primary:active { transform: scale(.98); opacity: .92; }
-    .error-tip { display: none; color: var(--danger-color); font-size: 12px; margin-top: 10px; }
-    .question-card.error { border-color: rgba(213,73,65,.45); box-shadow: 0 8px 24px rgba(213,73,65,.08); }
-    .question-card.error .error-tip { display: block; }
-    @media (max-width: 390px) { .option-list.compact { grid-template-columns: 1fr; } .info-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="back-btn" onclick="history.back()">✕</div>
-    <h1>现场补访录入</h1>
+    <h1 id="pageTitle">随访执行</h1>
+    <div style="width: 32px;"></div>
   </div>
 
-  <div class="container" style="padding-bottom: 110px;">
+  <div class="container" style="padding-bottom: 130px;">
+    <!-- 患者与任务信息 -->
     <div class="top-card animate-up">
       <div class="patient-row">
         <div class="patient-main">
           <div class="avatar" id="patientAvatar">?</div>
           <div>
-            <div class="patient-name" id="patientName">请选择患者</div>
+            <div class="patient-name" id="patientName">--</div>
+            <div class="patient-meta" id="patientMeta">--</div>
           </div>
         </div>
-      </div>
-
-      <div class="patient-select-block" id="patientSelectBlock">
-        <div class="patient-select-label">选择待补访患者</div>
-        <select class="patient-select" id="patientSelect" onchange="handlePatientSelect()">
-          <option value="">请选择患者...</option>
-          <option value="刘*财" data-meta="D14 实验室检查单核对">刘*财（D14 实验室检查单核对）</option>
-          <option value="张*兰" data-meta="失访召回后现场补访">张*兰（失访召回后现场补访）</option>
-          <option value="王*建" data-meta="D21 周期随访登记">王*建（D21 周期随访登记）</option>
-        </select>
-      </div>
-      <div class="info-grid">
-        <div class="info-item"><div class="info-label">补访类型</div><div class="info-value">现场补访</div></div>
-        <div class="info-item"><div class="info-label">执行人</div><div class="info-value">项目专员</div></div>
-        <div class="info-item"><div class="info-label">表单来源</div><div class="info-value">标准问卷</div></div>
+        <span class="task-type-tag" id="taskTypeTag">--</span>
       </div>
     </div>
 
-    <div class="notice-card animate-up">
-      <div class="notice-icon">&#128221;</div>
-      <div>
-        <div class="notice-title">请按问卷逐项完成现场补访</div>
-        <div class="page-desc">本页已改为单页表单，所有必填项完成后即可提交；多选题可同时选择多个症状。</div>
-      </div>
+    <!-- AE 即时随访：患者上报描述 -->
+    <div class="report-card hidden" id="reportCard">
+      <div class="report-title"><span>🚨 患者上报的不适描述</span><span id="reportTime"></span></div>
+      <div class="report-text" id="reportText"></div>
     </div>
 
     <div class="progress-line">
-      <div class="progress-text"><span id="progressText">已完成 0 / 10</span><span>必填问卷</span></div>
+      <div class="progress-text"><span id="progressText">已完成 0 / 0</span><span id="progressMode">必填项</span></div>
       <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <div class="section-title">补访问卷</div>
-    <form id="followupForm"></form>
+    <div id="formRoot"></div>
+  </div>
+
+  <!-- 紧急升级线索横幅 -->
+  <div class="urgent-banner hidden" id="urgentBanner">
+    <div class="urgent-banner-inner">
+      <div class="u-icon">🚨</div>
+      <div>
+        <div class="u-title">检测到紧急升级线索</div>
+        <div class="u-text">建议提醒患者尽快就医，并同步项目经理 / PV 接口人。</div>
+      </div>
+    </div>
   </div>
 
   <div class="btn-group">
-    <button type="button" class="btn-primary" onclick="submitFollowup()">提交补访记录</button>
+    <button type="button" class="btn-primary" id="submitBtn" onclick="submitForm()">提交随访记录</button>
   </div>
 
+  <!-- 话术弹层 -->
+  <div class="sheet-mask" id="scriptSheet" onclick="if(event.target===this) closeScript()">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">📖 参考话术</div>
+      <div class="sheet-q" id="sheetQ"></div>
+      <div class="sheet-script" id="sheetScript"></div>
+      <button class="sheet-close" onclick="closeScript()">收起</button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
   <script>
-    const followupParams = new URLSearchParams(window.location.search);
-    const isTaskMode = followupParams.has('taskId');
+    /* ================= 问卷题库（对齐 V0.4 问卷库，含话术/跳转/紧急线索） ================= */
+    const Q = {
+      // 建档信息确认
+      q9:  { no:'Q9', module:'profile', type:'radio', required:true, title:'本次随访结果',
+             script:'我先确认一下，本次随访是否已经完成。',
+             options:[{v:'随访完成'},{v:'部分完成'},{v:'未联系到', action:'skipSummary'},{v:'患者拒绝随访', action:'withdraw'},{v:'其他'}] },
+      q10: { no:'Q10', module:'profile', type:'radio', required:true, title:'随访对象',
+             script:'请问现在填写或接听的是患者本人，还是患者授权的家属？',
+             options:[{v:'患者本人'},{v:'授权家属', show:['q11']},{v:'医护人员', show:['q11']},{v:'其他', show:['q11']}] },
+      q11: { no:'Q11', module:'profile', type:'text', required:true, title:'随访对象关系/身份', hidden:true,
+             script:'请问您与患者是什么关系，方便我准确记录。', placeholder:'如：患者女儿' },
+      // 基础疾病与治疗信息
+      q19: { no:'Q19', module:'base', type:'text', required:true, title:'癌种/适应症',
+             script:'我先帮您核对一下疾病信息，主要是为了后续随访不漏掉关键节点。', placeholder:'按患者或院内记录填写' },
+      q20: { no:'Q20', module:'base', type:'radio', required:true, title:'治疗阶段',
+             script:'我帮您确认一下目前处于哪个治疗阶段。',
+             options:[{v:'初始治疗'},{v:'维持治疗'},{v:'复发或进展后治疗'},{v:'术后辅助治疗'},{v:'新辅助治疗'},{v:'其他'},{v:'不清楚'}] },
+      q21: { no:'Q21', module:'base', type:'text', required:true, title:'当前治疗方案',
+             script:'我帮您核对一下医生目前安排的治疗方案。', placeholder:'记录医生方案，不评价方案' },
+      q22: { no:'Q22', module:'base', type:'text', required:false, title:'首次使用拓益时间',
+             script:'我帮您核对一下首次使用拓益的时间，精确到年月即可。', placeholder:'如：2026-03' },
+      q23: { no:'Q23', module:'base', type:'date', required:false, title:'本院首次治疗日期',
+             script:'我帮您核对一下在本院首次接受本品治疗的日期。' },
+      q24: { no:'Q24', module:'base', type:'date', required:true, title:'院内确认下次治疗/复诊日期',
+             script:'我根据院内信息和您刚才填写的时间，再确认一次下次治疗或复诊日期。' },
+      q25: { no:'Q25', module:'base', type:'multi', required:false, title:'既往病史',
+             script:'我再核对一下既往疾病情况，只记录随访需要的信息。',
+             options:[{v:'无', exclusive:true},{v:'心血管疾病'},{v:'糖尿病'},{v:'高血压'},{v:'乙肝'},{v:'感染/带状疱疹'},{v:'肝肾功能异常'},{v:'自身免疫性疾病'},{v:'其他'}] },
+      q26: { no:'Q26', module:'base', type:'multi', required:false, title:'合并用药情况',
+             script:'我再核对一下目前是否合并使用其他药物，避免遗漏需要提示医生了解的信息。',
+             options:[{v:'未合并使用其他药物', exclusive:true},{v:'抗生素'},{v:'糖皮质激素'},{v:'其他抗肿瘤药物'},{v:'抗病毒药物'},{v:'抗凝/抗血小板药物'},{v:'免疫抑制剂'},{v:'保健品'},{v:'其他'}] },
+      q27: { no:'Q27', module:'base', type:'radio', required:true, title:'建档信息完整度',
+             script:'我最后核对一下，本次建档信息是否都已经确认完整。',
+             options:[{v:'信息完整'},{v:'信息缺失/待院内确认', note:'将标记暂缓管理并设置复核节点，待信息补齐后完成建档'}] },
+      // 一般状态打开话匣
+      q28: { no:'Q28', module:'general', type:'radio', required:true, title:'近期整体状态',
+             script:'我先简单了解一下，您最近整体身体状态和之前相比怎么样？',
+             options:[{v:'差不多'},{v:'比以前好'},{v:'比以前差', note:'建议重点关注后续安全性总筛'},{v:'不确定'}] },
+      q29: { no:'Q29', module:'general', type:'radio', required:false, title:'体重变化',
+             script:'最近体重有没有明显变化？大概增加还是减少？',
+             options:[{v:'无显著变化'},{v:'轻微浮动'},{v:'明显增加'},{v:'明显降低'},{v:'不清楚'}] },
+      q30: { no:'Q30', module:'general', type:'radio', required:false, title:'近期饮食情况',
+             script:'最近吃饭情况怎么样？有没有食欲不好、吞咽困难或恶心呕吐影响进食？',
+             options:[{v:'正常饮食'},{v:'食欲不佳'},{v:'吞咽困难'},{v:'恶心呕吐影响进食'},{v:'其他'}] },
+      q31: { no:'Q31', module:'general', type:'radio', required:false, title:'近期活动/作息',
+             script:'最近活动、作息和睡眠情况有没有明显变化？',
+             options:[{v:'基本正常'},{v:'活动减少'},{v:'大部分时间卧床'},{v:'睡眠明显受影响'},{v:'其他'}] },
+      // 治疗计划与复查管理
+      q32: { no:'Q32', module:'plan', type:'radio', required:true, title:'医生确定的复查周期',
+             script:'我确认一下，医生给您安排的复查周期是哪一种？',
+             options:[{v:'按治疗周期复查'},{v:'月度复查'},{v:'季度复查'},{v:'半年度复查'},{v:'其他周期'},{v:'不清楚'}] },
+      q33: { no:'Q33', module:'plan', type:'date', required:false, title:'最近一次应复查日期',
+             script:'请确认最近一次应该复查的日期。' },
+      q34: { no:'Q34', module:'plan', type:'radio', required:true, title:'最近是否按时复查',
+             script:'最近这次复查是按时做了，还是计划往后延了？',
+             options:[{v:'暂未到复查日期'},{v:'按时复查'},{v:'有复查计划但推迟', show:['q35']},{v:'不打算复查', show:['q35']},{v:'不清楚'}] },
+      q35: { no:'Q35', module:'plan', type:'radio', required:true, title:'未按时/不复查原因', hidden:true,
+             script:'方便说一下这次没有按时复查的主要原因吗？我只是帮您记录，不评价这个决定。',
+             options:[{v:'有事耽搁'},{v:'挂不到号'},{v:'经济原因'},{v:'病情稳定主动延后'},{v:'感觉方案无效'},{v:'身体不适或副作用', note:'涉及身体不适时，安全性总筛请选择"有"并展开'},{v:'交通/外地'},{v:'其他'},{v:'不清楚'}] },
+      q36: { no:'Q36', module:'plan', type:'radio', required:true, title:'下次复诊预约状态',
+             script:'下次复诊或治疗现在已经预约好了吗？',
+             options:[{v:'已预约'},{v:'未预约', show:['q37']},{v:'正在预约', show:['q37']},{v:'不清楚'}] },
+      q37: { no:'Q37', module:'plan', type:'multi', required:true, title:'复诊/治疗困难', hidden:true,
+             script:'目前在挂号、检查预约、交通或时间安排上有没有困难？（不得承诺加号、优先就诊或检查预约）',
+             options:[{v:'无困难', exclusive:true},{v:'挂号困难'},{v:'检查预约困难'},{v:'交通/外地'},{v:'时间冲突'},{v:'经济压力'},{v:'其他'}] },
+      q38: { no:'Q38', module:'plan', type:'radio', required:true, title:'医嘱是否调整',
+             script:'医生有没有调整这次治疗或复诊安排？',
+             options:[{v:'未调整'},{v:'医生已调整'},{v:'患者自行调整', note:'请在依从性模块记录自行调整原因'},{v:'不清楚'}] },
+      // 依从性与脱落风险干预
+      q39: { no:'Q39', module:'compliance', type:'text', required:false, title:'当前医嘱用法用量',
+             script:'我帮您核对一下医生目前安排的用法用量。', placeholder:'按患者或院内可确认信息记录' },
+      q40: { no:'Q40', module:'compliance', type:'radio', required:true, title:'患者治疗状态',
+             script:'我想确认一下，您现在是按医嘱治疗，还是有延后、减量或停药的情况？',
+             options:[{v:'按医嘱治疗'},{v:'遵医嘱调整', show:['q41']},{v:'自行延后', show:['q42','q43']},{v:'自行减量', show:['q42','q43']},{v:'已停药', show:['q42','q43']},{v:'联系不上'},{v:'不清楚'}] },
+      q41: { no:'Q41', module:'compliance', type:'radio', required:true, title:'医嘱调整原因', hidden:true,
+             script:'如果是医生调整的，医生是怎么交代的？我帮您按原话记录。',
+             options:[{v:'疾病进展'},{v:'疾病稳定'},{v:'不良反应不耐受', note:'涉及不良反应时，安全性总筛请选择"有"并展开'},{v:'身体机能不适'},{v:'经济原因'},{v:'更换治疗方案'},{v:'其他'},{v:'不清楚'}] },
+      q42: { no:'Q42', module:'compliance', type:'radio', required:true, title:'自行调整/停药原因', hidden:true,
+             script:'如果是您这边自己延后、减量或停药，方便说一下主要原因吗？建议您也尽快和医生确认。',
+             options:[{v:'挂不上号'},{v:'经济原因'},{v:'感觉病情稳定'},{v:'感觉疗效不好'},{v:'不良反应不耐受', note:'涉及不良反应时，安全性总筛请选择"有"并展开'},{v:'交通/外地'},{v:'家属决定'},{v:'其他'},{v:'不清楚'}] },
+      q43: { no:'Q43', module:'compliance', type:'radio', required:true, title:'是否已联系医生', hidden:true,
+             script:'这个调整或延期的情况，您已经联系医生确认过了吗？',
+             options:[{v:'已联系'},{v:'未联系', note:'请提醒患者按医院流程咨询医生'},{v:'计划联系'},{v:'不清楚'}] },
+      q44: { no:'Q44', module:'compliance', type:'radio', required:true, title:'是否计划继续治疗',
+             script:'接下来您是否仍计划继续治疗？',
+             options:[{v:'是'},{v:'否', note:'标记脱落风险'},{v:'不确定', note:'标记脱落风险'},{v:'本次未随访到'}] },
+      q45: { no:'Q45', module:'compliance', type:'radio', required:true, title:'脱落风险等级',
+             script:'根据本次沟通情况，我按项目要求记录后续脱落风险。',
+             options:[{v:'无明显风险'},{v:'低风险'},{v:'中风险', show:['q46']},{v:'高风险', show:['q46']},{v:'无法判断'}] },
+      q46: { no:'Q46', module:'compliance', type:'multi', required:true, title:'脱落风险召回举措', hidden:true,
+             script:'我看看这次能帮您做哪些支持，比如提醒复查、记录不良反应或转项目经理协调。（不得承诺治疗效果、加号或优先就诊）',
+             options:[{v:'解释按时复诊的重要性'},{v:'协助识别不良反应并建议咨询医生'},{v:'进行患者教育'},{v:'协助了解支付/援助路径'},{v:'提醒按医院流程挂号或预约'},{v:'转项目经理协调'}] },
+      q47: { no:'Q47', module:'compliance', type:'date', required:true, title:'下次计划治疗/复诊日期',
+             script:'我确认一下您下次计划治疗或复诊的日期，方便后续提醒。' },
+      // 安全性总筛
+      q48: { no:'Q48', module:'safety', type:'radio', required:true, title:'是否出现安全性线索', safety:true,
+             script:'我想再确认一下，最近身体有没有出现和平时不太一样的不舒服，或者有没有因为身体不适联系医生、去门诊、急诊或住院？',
+             options:[{v:'未出现', preselect:true},{v:'有', show:['q49','q50','q51']},{v:'不确定', show:['q49','q50','q51']}] },
+      q49: { no:'Q49', module:'safety', type:'multi', required:true, title:'安全性信息分类', hidden:true,
+             script:'您刚才提到的情况，我帮您分一下类型，方便后续专业团队处理。',
+             options:[{v:'身体不适/症状', aeTrigger:true},{v:'检查异常', aeTrigger:true},{v:'门诊/急诊/住院', aeTrigger:true},{v:'妊娠/哺乳/父源暴露', specialNote:true},{v:'用药错误', specialNote:true},{v:'产品质量问题', specialNote:true},{v:'缺乏疗效/疾病进展', specialNote:true},{v:'误用/过量', specialNote:true}] },
+      q50: { no:'Q50', module:'safety', type:'radio', required:true, title:'信息来源', hidden:true,
+             script:'请问这个情况是您本人反馈的，还是家属、医护人员提到的？',
+             options:[{v:'患者本人'},{v:'授权家属'},{v:'医护人员'},{v:'项目人员发现'},{v:'其他'}] },
+      q51: { no:'Q51', module:'safety', type:'textarea', required:true, title:'安全性信息简述', hidden:true,
+             script:'我先按您说的情况客观记录，不判断是不是药品导致。', placeholder:'仅记录事实，不判断因果关系' },
+      // AE 基础信息与风险分级
+      q52: { no:'Q52', module:'ae', type:'textarea', required:true, title:'AE症状/事件描述',
+             script:'您先别着急，我先帮您把不舒服的情况问清楚。具体是哪里不舒服？', placeholder:'记录患者原话' },
+      q53: { no:'Q53', module:'ae', type:'date', required:true, title:'发生/开始时间',
+             script:'这个不舒服大概是从什么时候开始的？（无法明确时记录大概时间）' },
+      q54: { no:'Q54', module:'ae', type:'radio', required:true, title:'当前状态',
+             script:'现在情况是已经好转、还在持续，还是有加重的趋势？',
+             options:[{v:'已好转'},{v:'持续存在'},{v:'正在加重'},{v:'已解决'},{v:'未知'}] },
+      q55: { no:'Q55', module:'ae', type:'radio', required:true, title:'对生活影响',
+             script:'这个情况对您吃饭、睡觉、活动或日常生活影响大吗？',
+             options:[{v:'无明显影响'},{v:'轻度影响'},{v:'中度影响'},{v:'重度影响', urgent:true, note:'重度影响提示优先升级'},{v:'未知'}] },
+      q56: { no:'Q56', module:'ae', type:'multi', required:false, title:'已采取措施',
+             script:'出现这个情况后，您有没有自行处理、咨询医生，或者去门诊、急诊、住院？（不建议患者自行用药）',
+             options:[{v:'未处理', exclusive:true},{v:'自行观察'},{v:'自行用药'},{v:'咨询医生'},{v:'门诊就诊'},{v:'急诊就诊'},{v:'住院治疗'},{v:'其他'}] },
+      q57: { no:'Q57', module:'ae', type:'radio', required:true, title:'当前结局',
+             script:'目前这个情况最后怎么样了？是恢复了、好转了，还是还在继续？',
+             options:[{v:'已恢复'},{v:'好转中'},{v:'持续'},{v:'加重'},{v:'住院治疗中'},{v:'未知'}] },
+      q58: { no:'Q58', module:'ae', type:'radio', required:true, title:'AE症状分类',
+             script:'我根据您描述的主要表现，先帮您归到相近的类别，后面再针对性确认。',
+             options:[
+               {v:'腹泻/腹痛/疑似结肠炎', show:['q60','q61','q62']},
+               {v:'皮疹/瘙痒/皮肤反应', show:['q63','q64','q65']},
+               {v:'咳嗽/气短/疑似肺炎', show:['q66','q67','q68']},
+               {v:'胸闷/心慌/胸痛/疑似心肌炎', show:['q69','q70','q71']},
+               {v:'发热/寒战/感染样症状', show:['q72','q73','q74']},
+               {v:'黄疸/肝功能异常线索', show:['q75','q76','q77']},
+               {v:'其他症状', show:['q59']}
+             ] },
+      q59: { no:'Q59', module:'ae', type:'textarea', required:true, title:'其他症状说明', hidden:true, branch:true,
+             script:'请具体说一下症状和最关键的表现，我按事实记录。', placeholder:'按事实记录' },
+      // 腹泻分支
+      q60: { no:'Q60', module:'ae', type:'text', required:true, title:'腹泻次数变化', hidden:true, branch:true,
+             script:'大便比平时多了几次？现在每天大概几次？', placeholder:'如：平时1次/天，现在4-5次/天' },
+      q61: { no:'Q61', module:'ae', type:'multi', required:true, title:'腹泻伴随表现', hidden:true, branch:true,
+             script:'有没有腹痛、便血、发烧、口渴尿少，或者晚上也会腹泻？',
+             options:[{v:'腹痛'},{v:'便血/黑便', urgent:true},{v:'发热'},{v:'口渴尿少', urgent:true},{v:'夜间腹泻'},{v:'无法进食饮水', urgent:true},{v:'无以上情况', exclusive:true}] },
+      q62: { no:'Q62', module:'ae', type:'multi', required:false, title:'腹泻处理情况', hidden:true, branch:true,
+             script:'有没有用过止泻药、抗生素，或者已经去看过医生？',
+             options:[{v:'未处理', exclusive:true},{v:'自行止泻药'},{v:'抗生素'},{v:'门诊'},{v:'急诊/住院'},{v:'其他'}] },
+      // 皮疹分支
+      q63: { no:'Q63', module:'ae', type:'text', required:true, title:'皮疹部位/范围', hidden:true, branch:true,
+             script:'皮疹在哪里？大概多大范围？', placeholder:'如：背部、双下肢，约手掌大小' },
+      q64: { no:'Q64', module:'ae', type:'multi', required:true, title:'皮肤严重表现', hidden:true, branch:true,
+             script:'有没有水疱、破溃、口腔或眼部黏膜受累、发热，或者痒得影响睡觉？',
+             options:[{v:'水疱', urgent:true},{v:'破溃/渗液'},{v:'口腔或眼部黏膜受累', urgent:true},{v:'发热', urgent:true},{v:'明显疼痛'},{v:'瘙痒影响睡眠'},{v:'无以上情况', exclusive:true}] },
+      q65: { no:'Q65', module:'ae', type:'radio', required:false, title:'皮肤自行处理', hidden:true, branch:true,
+             script:'您有没有自行涂药或处理皮疹？（提醒不要抓破或自行乱涂药）',
+             options:[{v:'未处理'},{v:'自行处理'},{v:'咨询医生后处理'},{v:'已就医'},{v:'不清楚'}] },
+      // 呼吸道分支
+      q66: { no:'Q66', module:'ae', type:'multi', required:true, title:'呼吸道症状', hidden:true, branch:true,
+             script:'有没有新出现咳嗽、胸闷，走路、上楼会不会比以前更喘？',
+             options:[{v:'咳嗽'},{v:'胸闷'},{v:'活动后气短'},{v:'静息气短', urgent:true},{v:'无上述症状', exclusive:true}] },
+      q67: { no:'Q67', module:'ae', type:'radio', required:true, title:'活动耐量变化', hidden:true, branch:true,
+             script:'现在走路、上楼或日常活动时，气喘和以前相比有没有明显变化？',
+             options:[{v:'无变化'},{v:'轻度变差'},{v:'明显变差', urgent:true},{v:'无法完成日常活动', urgent:true},{v:'不清楚'}] },
+      q68: { no:'Q68', module:'ae', type:'multi', required:true, title:'呼吸道紧急线索', hidden:true, branch:true,
+             script:'有没有发热、胸痛、咯血、口唇发紫、血氧下降，或者无法平躺？',
+             options:[{v:'发热'},{v:'胸痛', urgent:true},{v:'咯血', urgent:true},{v:'口唇发紫', urgent:true},{v:'血氧下降', urgent:true},{v:'无法平躺', urgent:true},{v:'急诊/住院', urgent:true},{v:'无以上情况', exclusive:true}] },
+      // 心血管分支
+      q69: { no:'Q69', module:'ae', type:'multi', required:true, title:'心血管症状', hidden:true, branch:true,
+             script:'胸闷心慌什么时候开始？活动后会加重吗？有没有胸痛、晕厥、出汗、气短？',
+             options:[{v:'胸闷'},{v:'心慌/心悸'},{v:'胸痛', urgent:true},{v:'心跳很快或很乱'},{v:'气短'},{v:'无上述症状', exclusive:true}] },
+      q70: { no:'Q70', module:'ae', type:'text', required:false, title:'心血管症状起始和持续', hidden:true, branch:true,
+             script:'这种情况持续多久了？是反复出现还是一直存在？活动后会不会更明显？', placeholder:'记录患者原话' },
+      q71: { no:'Q71', module:'ae', type:'multi', required:true, title:'心血管紧急线索', hidden:true, branch:true,
+             script:'有没有晕厥、严重气短、大量出汗、无法平卧，或者已经去急诊/住院？',
+             options:[{v:'晕厥', urgent:true},{v:'严重气短', urgent:true},{v:'大量出汗'},{v:'无法平卧', urgent:true},{v:'急诊/住院', urgent:true},{v:'无以上情况', exclusive:true}] },
+      // 发热分支
+      q72: { no:'Q72', module:'ae', type:'text', required:true, title:'最高体温及持续时间', hidden:true, branch:true,
+             script:'体温最高多少？持续多久了？', placeholder:'如：38.9℃，持续2天' },
+      q73: { no:'Q73', module:'ae', type:'multi', required:true, title:'发热伴随症状', hidden:true, branch:true,
+             script:'有没有寒战、咳嗽、腹泻、尿痛、气短或意识不清？',
+             options:[{v:'寒战'},{v:'咳嗽'},{v:'腹泻'},{v:'尿痛'},{v:'气短', urgent:true},{v:'意识改变', urgent:true},{v:'血压低/晕厥', urgent:true},{v:'无以上情况', exclusive:true}] },
+      q74: { no:'Q74', module:'ae', type:'multi', required:false, title:'发热处理情况', hidden:true, branch:true,
+             script:'有没有使用退热药、抗生素，或者已经去看过医生？',
+             options:[{v:'未处理', exclusive:true},{v:'退热药'},{v:'抗生素'},{v:'门诊'},{v:'急诊/住院'},{v:'其他'}] },
+      // 黄疸/肝功能分支
+      q75: { no:'Q75', module:'ae', type:'multi', required:true, title:'黄疸/肝功能异常表现', hidden:true, branch:true,
+             script:'有没有眼睛或皮肤发黄？尿色像浓茶吗？有没有右上腹痛或恶心明显？',
+             options:[{v:'眼睛或皮肤发黄', urgent:true},{v:'尿色像浓茶', urgent:true},{v:'右上腹痛', urgent:true},{v:'明显恶心'},{v:'食欲明显下降'},{v:'无以上情况', exclusive:true}] },
+      q76: { no:'Q76', module:'ae', type:'text', required:false, title:'肝功能检查异常', hidden:true, branch:true,
+             script:'如果您手头有检查结果，可以告诉我ALT、AST、胆红素等异常指标和检查日期。', placeholder:'不主动索取完整病历' },
+      q77: { no:'Q77', module:'ae', type:'text', required:false, title:'合并用药/饮酒情况', hidden:true, branch:true,
+             script:'近期有没有合并用药、保健品或饮酒情况需要一并记录？', placeholder:'仅记录患者主动提供的信息' },
+      // AE 收尾
+      q78: { no:'Q78', module:'ae', type:'multi', required:true, title:'紧急升级线索核对',
+             script:'我确认一下有没有需要马上重视的情况，比如明显出血、严重气短、意识改变、黄疸、急诊或住院。',
+             options:[{v:'便血/黑便或剧烈腹痛', urgent:true},{v:'持续高热或明显脱水', urgent:true},{v:'大面积皮疹/水疱/黏膜受累', urgent:true},{v:'静息气短/胸痛/口唇发紫/血氧下降', urgent:true},{v:'晕厥或严重心律失常', urgent:true},{v:'黄疸/深色尿或明显腹痛', urgent:true},{v:'意识改变/血压低', urgent:true},{v:'无以上情况', exclusive:true}] },
+      q79: { no:'Q79', module:'ae', type:'radio', required:true, title:'项目风险识别等级',
+             script:'我根据您说的情况按项目风险识别要求记录。这不是医学诊断，也不代表判断药品导致。',
+             options:[{v:'轻度/常规记录线索'},{v:'关注跟进线索'},{v:'快速/紧急升级线索', urgent:true},{v:'无法判断', note:'不由项目端自行筛除，转PV初筛确认'}] },
+      q80: { no:'Q80', module:'ae', type:'radio', required:true, title:'是否同意后续随访',
+             script:'后续如果专业团队需要进一步确认，您愿意继续接听随访吗？',
+             options:[{v:'同意'},{v:'不同意', note:'记录并尊重意愿'},{v:'需联系其他家属'},{v:'未确认'}] },
+      q81: { no:'Q81', module:'ae', type:'multi', required:true, title:'本次安全处理动作',
+             script:'我会把情况按项目流程记录并转交专业团队确认，同时提醒您必要时尽快联系医生。',
+             options:[{v:'记录事实并转PV复核'},{v:'提醒尽快联系医生'},{v:'提醒出现严重症状及时就医'},{v:'通知项目经理'},{v:'同步质量部门'},{v:'安排补充随访'},{v:'其他'}] },
+      // 事件补充与结局更新（AE即时随访模式）
+      q104: { no:'Q104', module:'outcome', type:'radio', required:true, title:'事件结局更新',
+              script:'上次您提到的情况，我想按项目要求再补充确认几项信息。现在情况怎么样了？',
+              options:[{v:'已恢复'},{v:'好转中'},{v:'持续'},{v:'加重'},{v:'住院治疗中'},{v:'未知'}] },
+      q105: { no:'Q105', module:'outcome', type:'multi', required:false, title:'就医/住院情况',
+              script:'因为这个情况，您后来有没有门诊、急诊或住院？',
+              options:[{v:'未就医', exclusive:true},{v:'门诊'},{v:'急诊'},{v:'住院'},{v:'已出院'},{v:'不清楚'}] },
+      q106: { no:'Q106', module:'outcome', type:'text', required:false, title:'医生诊断或处理',
+              script:'医生有没有给出诊断、检查或处理意见？您方便提供的部分我帮您记录。', placeholder:'不主动索取完整病历' },
+      // 患者关切
+      q116: { no:'Q116', module:'concern', type:'multi', required:false, title:'患者关心的问题',
+              script:'最后我想了解一下，您近期比较关心哪些问题？',
+              options:[{v:'药品价格/支付压力'},{v:'新药或治疗方案咨询'},{v:'慈善援助政策'},{v:'疾病治疗咨询'},{v:'不良反应及处理'},{v:'医保政策'},{v:'营养搭配'},{v:'心理/情绪支持'},{v:'无', exclusive:true}] },
+      q117: { no:'Q117', module:'concern', type:'textarea', required:false, title:'其他服务需求',
+              script:'除了刚才提到的问题，您还有哪些需要项目协助记录或转达的问题？（不得承诺超出项目权限的服务）', placeholder:'仅记录需求，按项目权限转接' },
+      // 随访小结
+      q118: { no:'Q118', module:'summary', type:'textarea', required:true, title:'本次随访小结',
+              script:'我最后核对一下本次随访记录，包括治疗、复查、身体情况和需要转交的问题。',
+              placeholder:'概括本次随访：有效性、依从性、安全性、服务动作及下次重点' },
+      q119: { no:'Q119', module:'summary', type:'date', required:true, title:'下次随访日期',
+              script:'我确认一下下次随访日期，方便系统生成提醒。' },
+      q120: { no:'Q120', module:'summary', type:'text', required:false, title:'下次重点跟进事项',
+              script:'下次随访需要重点确认什么，我先记录下来。', placeholder:'如：确认皮疹转归及复诊结果' },
+      q121: { no:'Q121', module:'summary', type:'multi', required:true, title:'是否升级/转交',
+              script:'本次记录中有没有需要项目经理、PV、质量或医学团队进一步确认的内容？',
+              options:[{v:'无需升级', exclusive:true},{v:'项目经理', escalate:true},{v:'PV复核', escalate:true},{v:'PV初筛确认', escalate:true},{v:'质量部门', escalate:true},{v:'医学/院内接口', escalate:true}] },
+      q122: { no:'Q122', module:'summary', type:'text', required:false, title:'关联记录编号', hidden:true,
+              script:'如有相关AE、PV、质量或项目工单编号，我在这里关联，避免重复记录。', placeholder:'如：EV-2026-0312' }
+    };
 
-    function getPatientInitial(name) {
-      return name && name !== '请选择患者' ? name.charAt(0) : '?';
+    const MODULES = {
+      profile:    { title:'建档信息确认', icon:'🗂️', sub:'系统字段自动带入，专员核对' },
+      base:       { title:'基础疾病与治疗信息', icon:'🧬', sub:'首触达建档一次性采集' },
+      general:    { title:'一般状态（打开话匣）', icon:'💬', sub:'先聊近况，再进入正题' },
+      plan:       { title:'治疗计划与复查管理', icon:'📆', sub:'' },
+      compliance: { title:'依从性与脱落风险干预', icon:'🧭', sub:'' },
+      safety:     { title:'安全性总筛', icon:'🛡️', sub:'每次随访必做，需主动确认' },
+      ae:         { title:'AE基础信息与风险分级', icon:'🚨', sub:'安全性总筛阳性后展开' },
+      outcome:    { title:'事件补充与结局更新', icon:'🔄', sub:'关联原事件，不重复建案' },
+      concern:    { title:'患者关切', icon:'🙋', sub:'仅记录需求，按项目权限转接' },
+      summary:    { title:'随访小结', icon:'✅', sub:'本次必填' }
+    };
+
+    const MODE_CONFIG = {
+      cycle:   { title:'周期治疗/复诊随访', modules:['profile','general','plan','compliance','safety','ae','concern','summary'] },
+      profile: { title:'首触达建档', modules:['profile','base','plan','safety','ae','summary'] },
+      ae:      { title:'异常症状/AE即时随访', modules:['profile','safety','ae','outcome','summary'] }
+    };
+
+    /* ================= 页面状态 ================= */
+    const params = new URLSearchParams(location.search);
+    const mode = MODE_CONFIG[params.get('mode')] ? params.get('mode') : 'cycle';
+    const cfg = MODE_CONFIG[mode];
+    const taskId = params.get('taskId') || '';
+    const task = taskId ? App.getTaskById(taskId) : null;
+    const answers = {};           // qid -> value(s)
+    let safetyConfirmed = false;  // Q48 必须主动确认
+    let skipToSummary = false;    // Q9 未联系到
+
+    const TODAY = new Date().toISOString().slice(0, 10);
+    const FOLLOWUP_NO = 'TY-FU-' + TODAY.replace(/-/g, '') + '-' + (taskId ? taskId.replace('t', '0') : '001');
+
+    /* ================= 渲染 ================= */
+    function escapeHtml(t) {
+      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    function setPatientDisplay(name, meta, modeText) {
-      document.getElementById('patientName').innerText = name;
-      document.getElementById('patientAvatar').innerText = getPatientInitial(name);
-    }
+    function renderHeader() {
+      document.getElementById('pageTitle').innerText = cfg.title;
+      const tt = task ? App.getTaskType(task.type) : App.getTaskType(mode === 'ae' ? 'ae' : (mode === 'profile' ? 'profile' : 'cycle'));
+      const tag = document.getElementById('taskTypeTag');
+      tag.innerText = tt.icon + ' ' + tt.label;
+      tag.style.background = tt.bg; tag.style.color = tt.color;
 
-    function handlePatientSelect() {
-      const select = document.getElementById('patientSelect');
-      const option = select.options[select.selectedIndex];
-      if (!select.value) {
-        setPatientDisplay('请选择患者', '通用补访入口 · 需要先选择患者', '通用功能');
-        return;
+      const pName = task ? task.patient : (params.get('patient') || '沈*浩');
+      const pMeta = task ? `${task.gender} · ${task.age}岁 · ${task.disease} · ${task.cycle !== '-' ? task.cycle + '周期' : ''} · ${task.dept}` : '演示模式 · 未关联任务';
+      document.getElementById('patientName').innerText = pName;
+      document.getElementById('patientAvatar').innerText = pName.charAt(0);
+      document.getElementById('patientMeta').innerText = pMeta;
+
+      if (mode === 'ae' && task && task.report) {
+        document.getElementById('reportCard').classList.remove('hidden');
+        document.getElementById('reportText').innerText = task.report;
+        document.getElementById('reportTime').innerText = (task.source || '') + ' · ' + (task.sourceTime || '');
       }
-      setPatientDisplay(select.value, option.dataset.meta || '待现场补访', '通用功能');
+      document.getElementById('submitBtn').innerText = mode === 'ae' ? '提交并生成异常记录' : '提交随访记录';
     }
 
-    function initFollowupPage() {
-      const selectBlock = document.getElementById('patientSelectBlock');
-      const select = document.getElementById('patientSelect');
-      const patientFromTask = followupParams.get('patient') || '刘*财';
-      if (isTaskMode) {
-        selectBlock.classList.add('hidden');
-        setPatientDisplay(patientFromTask, '系统任务已指定患者 · 直接填写补访表单', '补访任务');
-      } else {
-        selectBlock.classList.remove('hidden');
-        if (select) select.value = '';
-        handlePatientSelect();
+    function renderSysFields() {
+      const user = App.getUser();
+      const fields = [
+        ['项目随访号', FOLLOWUP_NO],
+        ['本次随访日期', TODAY],
+        ['执行人', user.name + '（项目专员）'],
+        ['患者编号', task ? 'TY-PT-0' + task.id.replace('t','') + '8' : 'TY-PT-0102'],
+        ['就诊医院', task ? user.hospital : user.hospital],
+        ['就诊科室', task ? task.dept : user.dept],
+        ['性别', task ? task.gender : '男'],
+        ['年龄', task ? task.age + ' 岁' : '52 岁']
+      ];
+      return `<div class="question-card">
+        <div class="question-head">
+          <span class="question-no">系统</span>
+          <div class="question-title">建档信息核对 <span style="font-size:11px;color:var(--text-muted);font-weight:400;">（系统自动带入，专员核对，无需向患者提问）</span></div>
+        </div>
+        <div class="sys-field-grid">
+          ${fields.map(f => `<div class="sys-field"><div class="k">${f[0]}</div><div class="v">${f[1]}</div></div>`).join('')}
+        </div>
+      </div>`;
+    }
+
+    function renderQuestion(qid) {
+      const q = Q[qid];
+      const hiddenCls = q.hidden ? ' hidden' : '';
+      const branchCls = q.branch ? ' branch' : '';
+      let body = '';
+      if (q.type === 'radio' || q.type === 'multi') {
+        const inputType = q.type === 'multi' ? 'checkbox' : 'radio';
+        body = `<div class="option-list">` + q.options.map((o, i) => `
+          <label class="option-item ${o.preselect && q.safety ? 'preselect' : ''}" data-qid="${qid}">
+            <input type="${inputType}" name="q_${qid}" value="${escapeHtml(o.v)}" data-oidx="${i}">
+            <span class="option-text">${escapeHtml(o.v)}</span>
+            ${o.urgent ? '<span class="urgent-dot">紧急</span>' : ''}
+          </label>`).join('') + `</div>`;
+      } else if (q.type === 'text') {
+        body = `<input type="text" class="text-input" name="q_${qid}" placeholder="${q.placeholder || '请填写'}">`;
+      } else if (q.type === 'textarea') {
+        body = `<textarea class="extra-input" name="q_${qid}" placeholder="${q.placeholder || '请填写'}"></textarea>`;
+      } else if (q.type === 'date') {
+        body = `<input type="date" class="date-input" name="q_${qid}">`;
       }
-    }
-
-    const questions = [
-  {
-    "id": "001",
-    "question": "您是患者本人吗？后续随访是继续联系您吗？",
-    "type": "单选",
-    "required": true,
-    "items": [
-      "是本人，随访可联系本人",
-      "是本人，后续随访可能不便，需要联系代访人员（子女/配偶/监护人......）",
-      "不是本人，随访需要联系代访人员（子女/配偶/监护人......）"
-    ]
-  },
-  {
-    "id": "002",
-    "question": "我先帮您（或您父亲/您母亲/您太太/您先生......）登记一下基础信息，医生给您（或您父亲/您母亲/您太太/您先生......）处方上写的适应症是什么？（单选，必填，如患者表述不清可提醒查看病历）",
-    "type": "单选",
-    "required": true,
-    "items": [
-      "非小细胞肺癌",
-      "小细胞肺癌",
-      "肾癌",
-      "尿路上皮癌",
-      "食管癌",
-      "鼻咽癌",
-      "头颈鳞癌",
-      "三阴乳腺癌",
-      "乳腺癌（三阴以外）",
-      "淋巴瘤",
-      "黑色素瘤",
-      "肝癌",
-      "胃癌",
-      "结直肠癌",
-      "肉瘤",
-      "胆道癌",
-      "胰腺癌",
-      "宫颈癌",
-      "卵巢癌",
-      "其他"
-    ]
-  },
-  {
-    "id": "003",
-    "question": "您知道您（或您父亲/您母亲/您太太/您先生......）现在是几期了吗？",
-    "type": "单选",
-    "required": true,
-    "items": [
-      "I期",
-      "II期",
-      "III期",
-      "IV期",
-      "局部晚期",
-      "转移性",
-      "广泛期_仅小细胞肺癌"
-    ]
-  },
-  {
-    "id": "004",
-    "question": "您（或您父亲/您母亲/您太太/您先生......）目前是用的什么治疗方案？",
-    "type": "单选",
-    "required": true,
-    "items": [
-      "一线治疗_1L",
-      "一线治疗_1L（含转化治疗）_仅肝癌",
-      "二线治疗_2L",
-      "三线及以上治疗_3L及以上",
-      "诱导治疗_仅鼻咽癌",
-      "新辅助（可手术的）_仅肝癌",
-      "新辅助",
-      "辅助",
-      "保膀胱_仅尿路上皮癌",
-      "NMIBC_仅尿路上皮癌",
-      "围术期_仅非小细胞肺癌",
-      "SCLC_仅小细胞肺癌"
-    ]
-  },
-  {
-    "id": "005",
-    "question": "您（或您父亲/您母亲/您太太/您先生......）目前是否联合用药？",
-    "type": "单选",
-    "required": true,
-    "items": [
-      "拓益单药治疗",
-      "拓益联合化疗药，记录药品名称",
-      "拓益联合靶向药，记录药品名称",
-      "拓益联合其他药，记录药品名称"
-    ]
-  },
-  {
-    "id": "006",
-    "question": "您（或您父亲/您母亲/您太太/您先生......）目前是用的什么治疗方案，有没有手术过？",
-    "type": "单选",
-    "required": true,
-    "items": [
-      "已手术",
-      "未手术"
-    ]
-  },
-  {
-    "id": "007",
-    "question": "您（或您父亲/您母亲/您太太/您先生......）目前是否复发/转移？",
-    "type": "单选",
-    "required": true,
-    "items": [
-      "复发",
-      "转移",
-      "无转移",
-      "铂类化疗失败_仅尿路上皮癌"
-    ]
-  },
-  {
-    "id": "008",
-    "question": "那医嘱是让您（或您父亲/您母亲/您太太/您先生......）每2周一次去复诊用药，还是每3周一次？",
-    "type": "单选",
-    "required": true,
-    "items": [
-      "每2周一次",
-      "每3周一次"
-    ]
-  },
-  {
-    "id": "009",
-    "question": "您（或您父亲/您母亲/您太太/您先生......）这几天用完药，自己感觉症状有没有变化？是不是比之前还好一些？",
-    "type": "单选",
-    "required": true,
-    "items": [
-      "没变化，挺稳定",
-      "好转了",
-      "加重了",
-      "其他变化（您说一下：____）"
-    ]
-  },
-  {
-    "id": "010",
-    "question": "您（或您父亲/您母亲/您太太/您先生......）这几天吃饭睡觉都还正常吧？有没有出现不舒服的症状？（多选，必填）",
-    "type": "多选",
-    "required": true,
-    "items": [
-      "没有不舒服",
-      "恶心呕吐",
-      "发热",
-      "头痛",
-      "皮疹瘙痒",
-      "心律失常",
-      "咳嗽",
-      "免疫性肺炎",
-      "免疫性肝炎",
-      "免疫性甲状腺功能异常（甲减/甲亢）",
-      "免疫性皮疹",
-      "血淀粉酶升高或脂肪酶升高",
-      "心肌炎",
-      "胸炎",
-      "食欲减退",
-      "腹泻",
-      "乏力",
-      "失眠",
-      "口腔溃疡",
-      "关节痛",
-      "胸闷呼吸困难",
-      "免疫性腹泻/结肠炎",
-      "免疫性肾炎",
-      "免疫性高血糖症或一型糖尿病",
-      "血小板减少",
-      "胰腺炎",
-      "重症肌无力",
-      "其他（您详细说一下，我看看是不是需要去医院让医生处理：____）"
-    ]
-  }
-];
-
-    const needsRemark = new Set(['005', '009', '010']);
-    const form = document.getElementById('followupForm');
-    const progressText = document.getElementById('progressText');
-    const progressBar = document.getElementById('progressBar');
-
-    function isMulti(question) {
-      return question.type === '多选';
-    }
-
-    function escapeHtml(text) {
-      return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function renderQuestions() {
-      form.innerHTML = questions.map((question, index) => {
-        const inputType = isMulti(question) ? 'checkbox' : 'radio';
-        const compact = question.items.length > 8 ? ' compact' : '';
-        const options = question.items.map((item, itemIndex) => `
-          <label class="option-item" data-qid="${question.id}">
-            <input type="${inputType}" name="q_${question.id}" value="${escapeHtml(item)}" onchange="handleOptionChange('${question.id}')">
-            <span class="option-text">${escapeHtml(item)}</span>
-          </label>
-        `).join('');
-        const remark = needsRemark.has(question.id)
-          ? `<textarea class="extra-input" name="remark_${question.id}" placeholder="补充说明（选填）"></textarea>`
-          : '';
-        return `
-          <div class="question-card" id="card_${question.id}">
-            <div class="question-head">
-              <span class="question-no">${question.id}</span>
-              <div class="question-title">
-                ${escapeHtml(question.question)}${question.required ? '<span class="required">*</span>' : ''}
-                <span class="type-badge">${escapeHtml(question.type)}</span>
-              </div>
-            </div>
-            <div class="option-list${compact}">${options}</div>
-            ${remark}
-            <div class="error-tip">请完成本题后再提交</div>
+      const noteArea = `<div class="cond-note hidden" id="note_${qid}"></div>`;
+      const safetyHint = q.safety ? `<div class="safety-hint" id="safetyHint">⚠️ 系统默认展示"未出现"，请专员主动与患者确认实际情况后，重新点击选项完成确认。</div>` : '';
+      return `
+        <div class="question-card${branchCls}${hiddenCls}" id="card_${qid}">
+          <div class="question-head">
+            <span class="question-no">${q.no}</span>
+            <div class="question-title">${escapeHtml(q.title)}${q.required ? '<span class="required">*</span>' : ''}</div>
+            <button type="button" class="script-btn" data-qid="${qid}">📖 话术</button>
           </div>
-        `;
-      }).join('');
-      updateProgress();
+          ${body}
+          ${safetyHint}
+          ${noteArea}
+          <div class="error-tip">请完成本题后再提交</div>
+        </div>`;
     }
 
-    function handleOptionChange(questionId) {
-      document.querySelectorAll(`[data-qid="${questionId}"]`).forEach(label => {
+    function renderForm() {
+      const root = document.getElementById('formRoot');
+      let html = '';
+      cfg.modules.forEach(mk => {
+        const m = MODULES[mk];
+        const qids = Object.keys(Q).filter(k => Q[k].module === mk);
+        const condCls = (mk === 'ae' && mode !== 'ae') ? ' cond-hidden' : '';
+        html += `<div class="module-block${condCls}" id="mod_${mk}">
+          <div class="module-head">
+            <div class="module-icon">${m.icon}</div>
+            <div><div class="module-title">${m.title}</div>${m.sub ? `<div class="module-sub">${m.sub}</div>` : ''}</div>
+          </div>
+          ${mk === 'profile' ? renderSysFields() : ''}
+          ${qids.map(renderQuestion).join('')}
+        </div>`;
+      });
+      root.innerHTML = html;
+    }
+
+    /* ================= 交互逻辑 ================= */
+    function openScript(qid) {
+      const q = Q[qid];
+      document.getElementById('sheetQ').innerText = q.no + ' · ' + q.title;
+      document.getElementById('sheetScript').innerText = q.script || '本题暂无配置话术。';
+      document.getElementById('scriptSheet').classList.add('active');
+    }
+    function closeScript() { document.getElementById('scriptSheet').classList.remove('active'); }
+
+    function getOption(qid, value) {
+      return (Q[qid].options || []).find(o => o.v === value);
+    }
+
+    function setQuestionVisible(qid, visible) {
+      const card = document.getElementById('card_' + qid);
+      if (!card) return;
+      card.classList.toggle('hidden', !visible);
+      if (!visible) clearAnswer(qid);
+    }
+
+    function clearAnswer(qid) {
+      delete answers[qid];
+      document.querySelectorAll(`input[name="q_${qid}"]`).forEach(i => { i.checked = false; });
+      document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach(l => l.classList.remove('checked'));
+      const t = document.querySelector(`textarea[name="q_${qid}"], input.text-input[name="q_${qid}"], input.date-input[name="q_${qid}"]`);
+      if (t) t.value = '';
+      // 级联收起子问题
+      (Q[qid].options || []).forEach(o => (o.show || []).forEach(child => setQuestionVisible(child, false)));
+    }
+
+    function handleOption(qid, changedEl) {
+      const q = Q[qid];
+
+      // 互斥选项（无以上情况等）：以本次点击的选项为准
+      if (q.type === 'multi' && changedEl) {
+        const clickedOpt = getOption(qid, changedEl.value);
+        if (clickedOpt && clickedOpt.exclusive && changedEl.checked) {
+          document.querySelectorAll(`input[name="q_${qid}"]`).forEach(i => { if (i !== changedEl) i.checked = false; });
+        } else if (changedEl.checked) {
+          document.querySelectorAll(`input[name="q_${qid}"]`).forEach(i => {
+            const o = getOption(qid, i.value);
+            if (o && o.exclusive) i.checked = false;
+          });
+        }
+      }
+
+      const values = Array.from(document.querySelectorAll(`input[name="q_${qid}"]:checked`)).map(i => i.value);
+      answers[qid] = q.type === 'multi' ? values : (values[0] || undefined);
+      if (answers[qid] === undefined || (Array.isArray(answers[qid]) && !answers[qid].length)) delete answers[qid];
+
+      // 样式
+      document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach(label => {
         const input = label.querySelector('input');
         label.classList.toggle('checked', input.checked);
+        if (q.safety) label.classList.remove('preselect');
       });
-      const card = document.getElementById(`card_${questionId}`);
-      if (card && hasAnswer(questionId)) card.classList.remove('error');
+
+      // Q48 主动确认
+      if (q.safety && values.length) {
+        safetyConfirmed = true;
+        const hint = document.getElementById('safetyHint');
+        hint.classList.add('ok');
+        hint.innerText = '✅ 已完成安全性总筛主动确认。';
+      }
+
+      // 条件展开：单选按选中项展开，多选合并展开
+      if (q.options) {
+        const toShow = new Set();
+        values.forEach(v => (getOption(qid, v).show || []).forEach(s => toShow.add(s)));
+        const allChildren = new Set();
+        q.options.forEach(o => (o.show || []).forEach(s => allChildren.add(s)));
+        allChildren.forEach(child => setQuestionVisible(child, toShow.has(child)));
+      }
+
+      // 选项备注提示
+      const noteEl = document.getElementById('note_' + qid);
+      if (noteEl) {
+        const notes = values.map(v => getOption(qid, v)).filter(o => o && o.note).map(o => '💡 ' + o.note);
+        noteEl.classList.toggle('hidden', !notes.length);
+        noteEl.innerHTML = notes.join('<br>');
+      }
+
+      // Q9 特殊动作
+      if (qid === 'q9') {
+        const v = values[0];
+        if (v === '患者拒绝随访') {
+          if (confirm('患者拒绝随访，将进入「退出/拒访管理」流程。\n（当次获知的安全性信息仍需记录转交）')) {
+            location.href = 'withdraw-form.html?taskId=' + taskId + '&patient=' + encodeURIComponent(document.getElementById('patientName').innerText);
+            return;
+          }
+        }
+        skipToSummary = (v === '未联系到');
+        cfg.modules.forEach(mk => {
+          if (['profile','summary'].includes(mk)) return;
+          document.getElementById('mod_' + mk).classList.toggle('cond-hidden', skipToSummary || (mk === 'ae' && mode !== 'ae' && !aeVisible()));
+        });
+      }
+
+      // Q49 → AE 模块 / 特殊情形提示
+      if (qid === 'q49') updateAeVisibility(values);
+
+      // Q121 → Q122
+      if (qid === 'q121') {
+        const need = values.some(v => getOption('q121', v).escalate);
+        setQuestionVisible('q122', need);
+      }
+
+      updateUrgentBanner();
+      updateProgress();
+      const card = document.getElementById('card_' + qid);
+      if (card) card.classList.remove('error');
+    }
+
+    function aeVisible() {
+      const vals = answers['q49'] || [];
+      return vals.some(v => { const o = getOption('q49', v); return o && o.aeTrigger; });
+    }
+
+    function updateAeVisibility(values) {
+      const showAe = mode === 'ae' || aeVisible();
+      document.getElementById('mod_ae').classList.toggle('cond-hidden', !showAe || skipToSummary);
+      // 特殊情形提示
+      const special = values.filter(v => getOption('q49', v).specialNote);
+      const noteEl = document.getElementById('note_q49');
+      let html = '';
+      if (special.length) html += '💡 已选择特殊情形类信息（' + special.join('、') + '），将按「特殊情形/PV分流」流程转交专业团队。';
+      if (aeVisible()) html += (html ? '<br>' : '') + '🚨 已触发「AE基础信息与风险分级」模块，请继续完成下方分级追问。';
+      noteEl.classList.toggle('hidden', !html);
+      noteEl.innerHTML = html;
+    }
+
+    function handleText(qid) {
+      const el = document.querySelector(`[name="q_${qid}"]`);
+      answers[qid] = el.value.trim() || undefined;
+      if (!answers[qid]) delete answers[qid];
+      document.getElementById('card_' + qid).classList.remove('error');
       updateProgress();
     }
 
-    function hasAnswer(questionId) {
-      return document.querySelectorAll(`input[name="q_${questionId}"]:checked`).length > 0;
+    function updateUrgentBanner() {
+      let urgent = false;
+      Object.keys(answers).forEach(qid => {
+        const q = Q[qid];
+        if (!q.options) return;
+        const vals = Array.isArray(answers[qid]) ? answers[qid] : [answers[qid]];
+        vals.forEach(v => { const o = getOption(qid, v); if (o && o.urgent) urgent = true; });
+      });
+      document.getElementById('urgentBanner').classList.toggle('hidden', !urgent);
+      return urgent;
+    }
+
+    function isAnswered(qid) {
+      const q = Q[qid];
+      const card = document.getElementById('card_' + qid);
+      if (!card || card.classList.contains('hidden')) return true;
+      if (q.module && document.getElementById('mod_' + q.module).classList.contains('cond-hidden')) return true;
+      if (q.safety) return safetyConfirmed;
+      const v = answers[qid];
+      if (Array.isArray(v)) return v.length > 0;
+      return v !== undefined && v !== '';
+    }
+
+    function visibleRequired() {
+      return cfg.modules.flatMap(mk => Object.keys(Q).filter(k => Q[k].module === mk))
+        .filter(qid => Q[qid].required && !isSkipped(qid));
+    }
+
+    function isSkipped(qid) {
+      const q = Q[qid];
+      const card = document.getElementById('card_' + qid);
+      if (card && card.classList.contains('hidden')) return true;
+      if (q.module && document.getElementById('mod_' + q.module).classList.contains('cond-hidden')) return true;
+      return false;
     }
 
     function updateProgress() {
-      const requiredQuestions = questions.filter(q => q.required);
-      const done = requiredQuestions.filter(q => hasAnswer(q.id)).length;
-      progressText.textContent = `已完成 ${done} / ${requiredQuestions.length}`;
-      progressBar.style.width = `${requiredQuestions.length ? (done / requiredQuestions.length) * 100 : 100}%`;
+      const req = visibleRequired();
+      const done = req.filter(qid => isAnswered(qid)).length;
+      document.getElementById('progressText').innerText = `已完成 ${done} / ${req.length}`;
+      document.getElementById('progressBar').style.width = req.length ? (done / req.length * 100) + '%' : '0%';
     }
 
-    function collectAnswers() {
-      return questions.map(question => {
-        const checked = Array.from(document.querySelectorAll(`input[name="q_${question.id}"]:checked`)).map(input => input.value);
-        const remarkEl = document.querySelector(`[name="remark_${question.id}"]`);
-        return {
-          id: question.id,
-          question: question.question,
-          type: question.type,
-          answer: isMulti(question) ? checked : (checked[0] || ''),
-          remark: remarkEl ? remarkEl.value.trim() : ''
-        };
-      });
-    }
-
-    function submitFollowup() {
-      const patientSelect = document.getElementById('patientSelect');
-      if (!isTaskMode && patientSelect && !patientSelect.value) {
-        alert('请先选择需要进行现场补访的患者');
-        patientSelect.focus();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
+    /* ================= 提交 ================= */
+    function submitForm() {
+      // 安全性总筛主动确认校验
+      if (!skipToSummary && !safetyConfirmed) {
+        const card = document.getElementById('card_q48');
+        if (card && !isSkipped('q48')) {
+          card.classList.add('error');
+          card.querySelector('.error-tip').innerText = '请主动确认安全性总筛选项（即使默认"未出现"也需重新点击确认）';
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
       }
+      // 必填校验
       let firstInvalid = null;
-      questions.forEach(question => {
-        const card = document.getElementById(`card_${question.id}`);
-        const invalid = question.required && !hasAnswer(question.id);
-        if (card) card.classList.toggle('error', invalid);
+      visibleRequired().forEach(qid => {
+        const invalid = !isAnswered(qid);
+        const card = document.getElementById('card_' + qid);
+        if (card) {
+          card.classList.toggle('error', invalid);
+          if (invalid) card.querySelector('.error-tip').innerText = '请完成本题后再提交';
+        }
         if (invalid && !firstInvalid) firstInvalid = card;
       });
       if (firstInvalid) {
@@ -488,19 +816,57 @@
         return;
       }
 
-      const payload = {
-        patient: isTaskMode ? (followupParams.get('patient') || '') : (document.getElementById('patientSelect')?.value || ''),
-        scene: '现场补访',
-        submitTime: new Date().toISOString(),
-        answers: collectAnswers()
+      const urgent = updateUrgentBanner();
+      const escalate = (answers['q121'] || []).filter(v => v !== '无需升级');
+      const record = {
+        taskId, mode,
+        followupNo: FOLLOWUP_NO,
+        patient: document.getElementById('patientName').innerText,
+        taskType: cfg.title,
+        summary: answers['q118'] || '',
+        nextDate: answers['q119'] || '',
+        escalate: escalate.length ? escalate : ['无需升级'],
+        urgent,
+        answers
       };
-      console.log('followup payload', payload);
-      alert('现场补访记录已提交！');
-      window.location.href = 'index.html';
+      App.saveFollowupRecord(record);
+
+      if (mode === 'ae') {
+        alert('✅ 已生成异常记录，项目经理将跟进。\n' + (urgent ? '🚨 本次含紧急升级线索，请尽快同步项目经理 / PV 接口人。' : ''));
+      } else {
+        alert('✅ 随访记录已提交！' + (urgent ? '\n🚨 本次含紧急升级线索，请尽快同步项目经理 / PV 接口人。' : ''));
+      }
+      location.href = 'task-list.html';
     }
 
-    initFollowupPage();
-    renderQuestions();
+    /* ================= 事件委托 ================= */
+    document.getElementById('formRoot').addEventListener('change', e => {
+      const el = e.target;
+      const name = el.getAttribute && el.getAttribute('name');
+      if (!name || !name.startsWith('q_')) return;
+      const qid = name.slice(2);
+      if (el.type === 'radio' || el.type === 'checkbox') handleOption(qid, el);
+      else handleText(qid);
+    });
+    document.getElementById('formRoot').addEventListener('input', e => {
+      const el = e.target;
+      const name = el.getAttribute && el.getAttribute('name');
+      if (!name || !name.startsWith('q_')) return;
+      if (el.tagName === 'TEXTAREA' || el.type === 'text') handleText(name.slice(2));
+    });
+    document.getElementById('formRoot').addEventListener('click', e => {
+      const btn = e.target.closest('.script-btn');
+      if (btn) openScript(btn.dataset.qid);
+    });
+
+    /* ================= 初始化 ================= */
+    renderHeader();
+    renderForm();
+    // AE 即时随访模式：AE 模块常驻展开，安全性总筛待专员确认
+    if (mode === 'ae') {
+      document.getElementById('mod_ae').classList.remove('cond-hidden');
+    }
+    updateProgress();
   </script>
 </body>
 </html>

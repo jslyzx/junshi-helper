@@ -126,6 +126,46 @@
             </div>
         </div>
 
+        <div class="section-title animate-up" style="animation-delay: 0.15s;">
+            项目服务
+        </div>
+        <div class="action-grid animate-up" style="animation-delay: 0.18s; margin-bottom: 8px;">
+            <div class="action-btn" onclick="App.navigateTo('followup-form.html?mode=cycle')">
+                <div class="action-icon bg-teal">📝</div>
+                <div class="action-label">周期随访</div>
+            </div>
+            <div class="action-btn" onclick="App.navigateTo('edu-form.html')">
+                <div class="action-icon bg-blue">📚</div>
+                <div class="action-label">首周期教育</div>
+            </div>
+            <div class="action-btn" onclick="App.navigateTo('recall-form.html')">
+                <div class="action-icon bg-rose">📞</div>
+                <div class="action-label">失访召回</div>
+            </div>
+            <div class="action-btn" onclick="App.navigateTo('abnormal-form.html')">
+                <div class="action-icon bg-purple">⚠️</div>
+                <div class="action-label">异常提交</div>
+            </div>
+        </div>
+        <div class="action-grid animate-up" style="animation-delay: 0.2s;">
+            <div class="action-btn" id="btnSupplement2">
+                <div class="action-icon bg-orange">📎</div>
+                <div class="action-label">补充材料</div>
+            </div>
+            <div class="action-btn" onclick="App.navigateTo('followup-form.html?mode=ae')">
+                <div class="action-icon bg-rose" style="background: linear-gradient(135deg, #EA5455 0%, #B22222 100%);">🚨</div>
+                <div class="action-label">AE即时随访</div>
+            </div>
+            <div class="action-btn" onclick="App.navigateTo('work-record.html')">
+                <div class="action-icon bg-green">🗂️</div>
+                <div class="action-label">工作纪实</div>
+            </div>
+            <div class="action-btn" onclick="App.navigateTo('withdraw-form.html')">
+                <div class="action-icon" style="background: linear-gradient(135deg, #86909C 0%, #4E5969 100%);">🚪</div>
+                <div class="action-label">退出/拒访</div>
+            </div>
+        </div>
+
         <div class="section-title animate-up" style="animation-delay: 0.2s;">
             诊疗时间轴
         </div>
@@ -161,6 +201,7 @@
             document.getElementById('pEnrollDate').innerText = p.enrollDate;
             document.getElementById('pCycle').innerText = p.cycle;
             document.getElementById('btnSupplement').onclick = () => App.navigateTo(`supplement-form.html?id=${id}`);
+            document.getElementById('btnSupplement2').onclick = () => App.navigateTo(`supplement-form.html?id=${id}`);
 
             const timeline = App.getTimeline(id);
             const container = document.getElementById('timelineList');

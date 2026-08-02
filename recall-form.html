@@ -61,7 +61,7 @@
             <div class="card">
                 <div class="form-group">
                     <label class="form-label">逾期失访患者</label>
-                    <select class="form-input">
+                    <select class="form-input" id="recallPatientSelect">
                         <option value="">请选择需召回患者...</option>
                         <option value="1" selected>张*兰 (逾期 5 天 | 第二次致电)</option>
                         <option value="2">陈*刚 (逾期 14 天 | 临界脱落)</option>
@@ -141,8 +141,25 @@
         <button class="btn-flex btn-primary" id="nextBtn" onclick="nextStep()">下一步</button>
     </div>
 
+    <script src="js/app.js"></script>
     <script>
         let currentStep = 1;
+        const recallParams = new URLSearchParams(window.location.search);
+
+        // 任务模式：预填召回患者
+        (function initRecallPatient() {
+            const p = recallParams.get('patient');
+            const taskId = recallParams.get('taskId');
+            const t = taskId ? App.getTaskById(taskId) : null;
+            const sel = document.getElementById('recallPatientSelect');
+            if (p && sel) {
+                const opt = document.createElement('option');
+                opt.value = 'task';
+                opt.text = p + (t ? ` (${t.planDate} | ${t.disease} ${t.cycle}周期)` : ' (任务指派)');
+                opt.selected = true;
+                sel.appendChild(opt);
+            }
+        })();
 
         function nextStep() {
             if (currentStep < 3) {
@@ -165,8 +182,9 @@
                 updateBtns();
                 window.scrollTo(0, 0);
             } else {
+                if (recallParams.get('taskId')) App.completeTask(recallParams.get('taskId'));
                 alert('召回记录已同步保存！');
-                window.location.href = 'index.html';
+                window.location.href = recallParams.get('taskId') ? 'task-list.html?type=recall' : 'index.html';
             }
         }
 

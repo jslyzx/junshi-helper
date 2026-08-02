@@ -132,8 +132,10 @@
         <button class="btn-flex btn-primary" id="nextBtn" onclick="nextStep()">核查完毕进入下一步</button>
     </div>
 
+    <script src="js/app.js"></script>
     <script>
         let currentStep = 1;
+        const abParams = new URLSearchParams(window.location.search);
 
         function nextStep() {
             if (currentStep < 3) {
@@ -156,8 +158,9 @@
                 updateBtns();
                 window.scrollTo(0, 0);
             } else {
-                alert('异常处置记录已流转至临床决策系统！');
-                window.location.href = 'index.html';
+                if (abParams.get('taskId')) App.completeTask(abParams.get('taskId'));
+                alert('异常处置记录已流转，项目经理将跟进 PV 状态！');
+                window.location.href = abParams.get('taskId') ? 'task-list.html?type=pv' : 'index.html';
             }
         }
 

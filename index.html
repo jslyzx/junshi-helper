@@ -247,16 +247,16 @@
         <div class="stats-grid animate-up" style="animation-delay: 0.1s; cursor: pointer;"
             onclick="App.navigateTo('task-list.html')">
             <div class="stats-item">
-                <div class="stats-value" id="statTarget">100</div>
-                <div class="stats-label">本周应入组人数</div>
-            </div>
-            <div class="stats-item">
-                <div class="stats-value" id="statActual">84</div>
-                <div class="stats-label">已入组人数</div>
-            </div>
-            <div class="stats-item">
-                <div class="stats-value" id="statPending" style="color: var(--warning-color);">14</div>
+                <div class="stats-value" id="statPending" style="color: var(--warning-color);">-</div>
                 <div class="stats-label">待处理任务</div>
+            </div>
+            <div class="stats-item">
+                <div class="stats-value" id="statToday">-</div>
+                <div class="stats-label">今日到期</div>
+            </div>
+            <div class="stats-item">
+                <div class="stats-value" id="statAe" style="color: var(--danger-color);">-</div>
+                <div class="stats-label">AE 待随访</div>
             </div>
         </div>
 
@@ -269,21 +269,25 @@
                 <div class="action-icon bg-orange">📷</div>
                 <div class="action-label">专属二维码</div>
             </div>
-            <div class="action-btn" onclick="App.navigateTo('followup-form.html')">
-                <div class="action-icon bg-green">📝</div>
-                <div class="action-label">现场补访</div>
+            <div class="action-btn" onclick="App.navigateTo('enroll-form.html')">
+                <div class="action-icon bg-green">📋</div>
+                <div class="action-label">现场入组</div>
+            </div>
+            <div class="action-btn" onclick="App.navigateTo('task-list.html?type=cycle')">
+                <div class="action-icon bg-teal">📝</div>
+                <div class="action-label">周期随访</div>
             </div>
             <div class="action-btn" onclick="App.navigateTo('edu-form.html')">
                 <div class="action-icon bg-blue">📚</div>
                 <div class="action-label">首周期教育</div>
             </div>
+        </div>
+
+        <div class="action-grid animate-up" style="animation-delay: 0.15s;">
             <div class="action-btn" onclick="App.navigateTo('recall-form.html')">
                 <div class="action-icon bg-rose">📞</div>
                 <div class="action-label">失访召回</div>
             </div>
-        </div>
-
-        <div class="action-grid animate-up" style="animation-delay: 0.15s;">
             <div class="action-btn" onclick="App.navigateTo('patient-list.html')">
                 <div class="action-icon bg-teal">👥</div>
                 <div class="action-label">患者管理</div>
@@ -292,20 +296,44 @@
                 <div class="action-icon bg-purple">⚠️</div>
                 <div class="action-label">异常回流</div>
             </div>
+            <div class="action-btn" onclick="App.navigateTo('supplement-form.html')">
+                <div class="action-icon bg-blue" style="background: linear-gradient(135deg, #4481EB 0%, #04BEFE 100%);">📎</div>
+                <div class="action-label">补充材料</div>
+            </div>
+        </div>
+
+        <div class="action-grid animate-up" style="animation-delay: 0.2s;">
             <div class="action-btn" onclick="App.navigateTo('work-record.html')">
-                <div class="action-icon bg-blue" style="background: linear-gradient(135deg, #4481EB 0%, #04BEFE 100%);">
-                    📎</div>
+                <div class="action-icon bg-green" style="background: var(--primary-gradient);">🗂️</div>
                 <div class="action-label">工作纪实</div>
             </div>
+            <div class="action-btn" onclick="App.navigateTo('complaint-list.html')">
+                <div class="action-icon bg-rose" style="background: linear-gradient(135deg, #F7BA2A 0%, #EA5455 100%);">📮</div>
+                <div class="action-label">投诉记录</div>
+            </div>
             <div class="action-btn" onclick="App.navigateTo('helper-edu.html')">
-                <div class="action-icon bg-green" style="background: var(--primary-gradient);">📖</div>
+                <div class="action-icon bg-purple">📖</div>
                 <div class="action-label">培训中心</div>
+            </div>
+            <div class="action-btn" onclick="App.navigateTo('report-center.html')">
+                <div class="action-icon bg-blue">📊</div>
+                <div class="action-label">数据报表</div>
+            </div>
+        </div>
+
+        <!-- 任务分类入口（V0.4 九类随访任务） -->
+        <div class="section-title animate-up" style="animation-delay: 0.25s;">
+            随访任务分类 <span onclick="App.navigateTo('task-list.html')">全部任务 ›</span>
+        </div>
+        <div class="card animate-up" style="animation-delay: 0.28s; padding: 14px 16px;">
+            <div id="taskCategoryGrid" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <!-- 由 JS 渲染 -->
             </div>
         </div>
 
         <!-- 待办任务流 -->
         <div class="section-title animate-up" style="animation-delay: 0.3s;">
-            今日待办 <span>查看全部 ›</span>
+            今日待办 <span onclick="App.navigateTo('task-list.html')" style="cursor: pointer;">查看全部 ›</span>
         </div>
         <div class="card animate-up" style="animation-delay: 0.35s; padding: 5px 20px;">
             <div id="todoList">
@@ -383,13 +411,17 @@
     <script>
         function renderPage() {
             const user = App.getUser();
-            const stats = App.getStats();
-            const todos = App.getTodos();
+            const stats = App.getTaskStats();
+            const tasks = App.getTasks().filter(t => t.status !== 'done');
 
             document.getElementById('userName').innerText = user.name;
-            document.getElementById('statTarget').innerText = "100"; // 模拟应入组目标
-            document.getElementById('statActual').innerText = stats.totalPatients; // 模拟已入组人数
-            document.getElementById('statPending').innerText = "14"; // 对应底部任务数
+            document.getElementById('statPending').innerText = stats.pending;
+            document.getElementById('statToday').innerText = stats.today;
+            document.getElementById('statAe').innerText = stats.ae;
+
+            // 底部任务角标
+            const navBadge = document.querySelector('.tab-bar .badge');
+            if (navBadge) navBadge.innerText = stats.pending;
 
             const msgCount = App.getUnreadCount();
             const badge = document.getElementById('msgBadge');
@@ -400,34 +432,58 @@
                 badge.style.display = 'none';
             }
 
-            const list = document.getElementById('todoList');
-            list.innerHTML = todos.map(item => {
-                const isUploadTask = item.type === '材料待上传';
-                const isEducationTask = item.type === '首周期教育';
-                const isFollowupTask = item.type === '现场补访';
-                const clickAction = isUploadTask
-                    ? `App.navigateTo('upload-docs.html?id=${item.id}')`
-                    : (isEducationTask
-                        ? `App.navigateTo('edu-form.html?taskId=${item.id}&patient=${encodeURIComponent(item.patient)}')`
-                        : (isFollowupTask
-                            ? `App.navigateTo('followup-form.html?taskId=${item.id}&patient=${encodeURIComponent(item.patient)}')`
-                            : `App.navigateTo('task-detail.html?id=${item.id}')`));
+            // 九类任务分类入口
+            const typeMap = {};
+            App.getTaskTypes().forEach(tt => typeMap[tt.key] = tt);
+            document.getElementById('taskCategoryGrid').innerHTML = stats.byType.map(item => {
+                const tt = typeMap[item.key];
+                return `<div onclick="App.navigateTo('task-list.html?type=${tt.key}')"
+                    style="display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; cursor:pointer;
+                    background:${tt.bg}; color:${tt.color}; font-size:12px; font-weight:700;">
+                    ${tt.icon} ${tt.label}
+                    <span style="background:rgba(255,255,255,.7); border-radius:9px; min-width:18px; height:18px; padding:0 5px;
+                    display:inline-flex; align-items:center; justify-content:center; font-size:10px;">${item.count}</span>
+                </div>`;
+            }).join('');
 
+            // 今日待办（按优先级与超期排序，取前 5 条）
+            const priorityWeight = { high: 0, med: 1, low: 2 };
+            const todos = tasks
+                .sort((a, b) => (a.status === 'overdue' ? -1 : 1) - (b.status === 'overdue' ? -1 : 1) || priorityWeight[a.priority] - priorityWeight[b.priority])
+                .slice(0, 5);
+
+            const ROUTE = {
+                auth:     t => `task-detail.html?id=${t.id}`,
+                profile:  t => `followup-form.html?mode=profile&taskId=${t.id}`,
+                cycle:    t => `followup-form.html?mode=cycle&taskId=${t.id}`,
+                recall:   t => `recall-form.html?taskId=${t.id}&patient=${encodeURIComponent(t.patient)}`,
+                withdraw: t => `withdraw-form.html?taskId=${t.id}`,
+                ae:       t => `followup-form.html?mode=ae&taskId=${t.id}`,
+                special:  t => `complaint-list.html?taskId=${t.id}`,
+                pv:       t => `abnormal-form.html?taskId=${t.id}&patient=${encodeURIComponent(t.patient)}`,
+                patient:  t => `task-detail.html?id=${t.id}`
+            };
+
+            const list = document.getElementById('todoList');
+            list.innerHTML = todos.map(t => {
+                const tt = typeMap[t.type];
                 return `
-                <div class="todo-item ${item.type === '异常回流' ? 'is-abnormal' : ''}" onclick="${clickAction}">
+                <div class="todo-item ${t.type === 'ae' ? 'is-abnormal' : ''}" onclick="App.navigateTo('${ROUTE[t.type](t)}')">
                     <div class="todo-info">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="priority-tag priority-${item.priority}">${item.priority === 'high' ? '高' : (item.priority === 'med' ? '中' : '低')}</span>
-                            <span class="todo-title">${item.type} - ${item.patient}</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span class="priority-tag priority-${t.priority}">${t.priority === 'high' ? '高' : (t.priority === 'med' ? '中' : '低')}</span>
+                            <span class="todo-title">${t.patient} · ${t.disease}</span>
                         </div>
-                        <div class="todo-desc">${item.desc}</div>
+                        <div class="todo-desc">
+                            <span style="color:${tt.color}; font-weight:700;">${tt.icon} ${tt.label}</span> · ${t.desc}
+                        </div>
                     </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">${item.time}</div>
-                        <div class="todo-action">${item.type === '异常回流' ? '上报' : (isUploadTask ? '上传' : '处理')}</div>
+                    <div style="text-align: right; flex-shrink: 0;">
+                        <div style="font-size: 11px; color: ${t.status === 'overdue' ? 'var(--danger-color)' : 'var(--text-muted)'}; margin-bottom: 4px;">${t.planDate}</div>
+                        <div class="todo-action">处理</div>
                     </div>
-                </div>
-            `}).join('');
+                </div>`;
+            }).join('');
         }
 
         function toggleQrModal(show) {
